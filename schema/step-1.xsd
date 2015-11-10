@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+    <xs:element name="document">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="paragraph" type="paragraphType" maxOccurs="unbounded" />
+            </xs:sequence>
+            
+            <xs:attribute name="line-width" type="xs:integer" use="required" />
+            <xs:attribute name="align" type="alignment" use="required" />
+            <xs:attribute name="font-size" type="xs:integer" use="required" />
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:complexType name="paragraphType">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="box" type="boxType" />
+                    <xs:element name="glue" type="glueType" />
+                    <xs:element name="penalty" type="penaltyType" />
+                </xs:choice>
+            </xs:sequence>
+            
+            <xs:attribute name="line-width" type="xs:integer" />
+            <xs:attribute name="align" type="alignment" />
+            <xs:attribute name="font-size" type="xs:integer" />
+    </xs:complexType>
+    
+    <xs:simpleType name="alignment">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="justified" />
+            <xs:enumeration value="ragged" />
+            <xs:enumeration value="centered" />
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:complexType name="boxType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="width" type="xs:double" use="required" />
+                <xs:anyAttribute />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    
+    <xs:complexType name="glueType">
+        <xs:attribute name="width" type="xs:double" use="required" />
+        <xs:attribute name="stretchability" type="xs:double" use="required" />
+        <xs:attribute name="shrinkability" type="xs:double" use="required" />
+        <xs:anyAttribute />
+    </xs:complexType>
+    
+    <xs:complexType name="penaltyType">
+        <xs:attribute name="width" type="xs:double" />
+        <xs:attribute name="penalty" type="xs:double" use="required" />
+        <xs:attribute name="break" type="breakType" use="required" />
+        <xs:anyAttribute />
+    </xs:complexType>
+    
+    <xs:simpleType name="breakType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="optional" />
+            <xs:enumeration value="prohibited" />
+            <xs:enumeration value="required" />
+        </xs:restriction>
+    </xs:simpleType>
+    
+    
+</xs:schema>

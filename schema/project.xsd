@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+    <xs:element name="project">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="student" type="studentType" />
+                <xs:element name="solution">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="step" type="stepType" minOccurs="4" maxOccurs="4" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:complexType name="studentType">
+        <xs:sequence>
+            <xs:element name="first-name" />
+            <xs:element name="last-name" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+    
+    <xs:complexType name="stepType">
+        <xs:sequence>
+            <xs:element name="transformation" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="fallback" type="xs:boolean" use="optional" />
+    </xs:complexType>
+</xs:schema>

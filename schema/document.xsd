@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+    <xs:element name="document">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="paragraph" type="paragraphType" maxOccurs="unbounded" />
+            </xs:sequence>
+            
+            <xs:attribute name="line-width" type="xs:integer" use="required" />
+            <xs:attribute name="align" type="alignment" use="required" />
+            <xs:attribute name="font-size" type="xs:integer" use="required" />
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:complexType name="paragraphType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="line-width" type="xs:integer" />
+                <xs:attribute name="align" type="alignment" />
+                <xs:attribute name="font-size" type="xs:integer" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    
+    <xs:simpleType name="alignment">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="justified" />
+            <xs:enumeration value="ragged" />
+            <xs:enumeration value="centered" />
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>
