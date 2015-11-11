@@ -36,23 +36,28 @@
 
     <!-- recursion -->
     <xsl:choose>
-        <!-- last word doesn't contain any more spaces-->
         <xsl:when test="not(contains($text, $separator))">
             <box>
                 <xsl:variable name="word" select="$text"/>
+
                 <xsl:attribute name="width">
                     <xsl:copy-of select="string-length($word) * 12" />
                 </xsl:attribute>
+                
                 <xsl:value-of select="$word"/>
+
             </box>
         </xsl:when>       
         <xsl:otherwise>
             <box>
                 <xsl:variable name="word" select="normalize-space(substring-before($text, $separator))"/>
+
                 <xsl:attribute name="width">
                     <xsl:copy-of select="string-length($word) * 12" />
                 </xsl:attribute>
+                
                 <xsl:value-of select="$word"/>
+
             </box>
             <glue>
                 <xsl:attribute name="stretchability">
@@ -65,6 +70,7 @@
                     <xsl:value-of select="$gluewidth" />
                 </xsl:attribute>
             </glue>
+
             <xsl:call-template name="tokenize">
                 <xsl:with-param name="text" select="substring-after($text, $separator)"/>
                 <xsl:with-param name="doc_width" select="$doc_width"/>
