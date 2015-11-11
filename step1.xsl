@@ -33,44 +33,124 @@
         </xsl:choose>
     </xsl:param>
     
-
-    <!-- recursion -->
     <xsl:choose>
-        <!-- last word doesn't contain any more spaces-->
-        <xsl:when test="not(contains($text, $separator))">
-            <box>
-                <xsl:variable name="word" select="$text"/>
-                <xsl:attribute name="width">
-                    <xsl:copy-of select="string-length($word) * 12" />
-                </xsl:attribute>
-                <xsl:value-of select="$word"/>
-            </box>
-        </xsl:when>       
-        <xsl:otherwise>
-            <box>
-                <xsl:variable name="word" select="normalize-space(substring-before($text, $separator))"/>
-                <xsl:attribute name="width">
-                    <xsl:copy-of select="string-length($word) * 12" />
-                </xsl:attribute>
-                <xsl:value-of select="$word"/>
-            </box>
-            <glue>
-                <xsl:attribute name="stretchability">
-                    <xsl:copy-of select="18" />
-                </xsl:attribute>
-                <xsl:attribute name="shrinkability">
-                    <xsl:copy-of select="0" />
-                </xsl:attribute>
-                <xsl:attribute name="width">
-                    <xsl:value-of select="$gluewidth" />
-                </xsl:attribute>
-            </glue>
-            <xsl:call-template name="tokenize">
-                <xsl:with-param name="text" select="substring-after($text, $separator)"/>
-                <xsl:with-param name="doc_width" select="$doc_width"/>
-                <xsl:with-param name="doc_align" select="$doc_align"/>
-            </xsl:call-template>
-        </xsl:otherwise>
+        <xsl:when test="$align = 'justified'">
+        <xsl:choose>
+            <!-- last word doesn't contain any more spaces-->
+            <xsl:when test="not(contains($text, $separator))">
+                <box>
+                    <xsl:variable name="word" select="$text"/>
+                    <xsl:attribute name="width">
+                        <xsl:copy-of select="string-length($word) * 12" />
+                    </xsl:attribute>
+                    <xsl:value-of select="$word"/>
+                </box>
+                <penalty>
+                    <xsl:attribute name="penalty">INF</xsl:attribute>
+                    <xsl:attribute name="break">prohibited</xsl:attribute>
+                </penalty>
+                <glue>
+                    <xsl:attribute name="width">0</xsl:attribute>
+                    <xsl:attribute name="stretchability">INF</xsl:attribute>
+                    <xsl:attribute name="shrinkability">0</xsl:attribute>
+                </glue>
+                <penalty>
+                    <xsl:attribute name="penalty">-INF</xsl:attribute>
+                    <xsl:attribute name="break">required</xsl:attribute>
+                </penalty>
+            </xsl:when>       
+            <xsl:otherwise>
+                <box>
+                    <xsl:variable name="word" select="normalize-space(substring-before($text, $separator))"/>
+                    <xsl:attribute name="width">
+                        <xsl:copy-of select="string-length($word) * 12" />
+                    </xsl:attribute>
+                    <xsl:value-of select="$word"/>
+                </box>
+                <glue>
+                    <xsl:attribute name="stretchability">
+                        <xsl:copy-of select="18" />
+                    </xsl:attribute>
+                    <xsl:attribute name="shrinkability">
+                        <xsl:copy-of select="0" />
+                    </xsl:attribute>
+                    <xsl:attribute name="width">
+                        <xsl:value-of select="$gluewidth" />
+                    </xsl:attribute>
+                </glue>
+                <xsl:call-template name="tokenize">
+                    <xsl:with-param name="text" select="substring-after($text, $separator)"/>
+                    <xsl:with-param name="doc_width" select="$doc_width"/>
+                    <xsl:with-param name="doc_align" select="$doc_align"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+        </xsl:when>
+        <xsl:when test="$align = 'centered'">
+        <xsl:choose>
+            <!-- last word doesn't contain any more spaces-->
+            <xsl:when test="not(contains($text, $separator))">
+                <glue>
+                    <xsl:attribute name="stretchability">18</xsl:attribute>
+                    <xsl:attribute name="shrinkability">0</xsl:attribute>
+                    <xsl:attribute name="width">0</xsl:attribute>
+                </glue>
+                <box>
+                    <xsl:variable name="word" select="$text"/>
+                    <xsl:attribute name="width">
+                        <xsl:copy-of select="string-length($word) * 12" />
+                    </xsl:attribute>
+                    <xsl:value-of select="$word"/>
+                </box>
+                <glue>
+                    <xsl:attribute name="stretchability">18</xsl:attribute>
+                    <xsl:attribute name="shrinkability">0</xsl:attribute>
+                    <xsl:attribute name="width">0</xsl:attribute>
+                </glue>
+                <penalty>
+                    <xsl:attribute name="penalty">0</xsl:attribute>
+                    <xsl:attribute name="break">optional</xsl:attribute>
+                </penalty>
+                <glue>
+                    <xsl:attribute name="stretchability">-36</xsl:attribute>
+                    <xsl:attribute name="shrinkability">0</xsl:attribute>
+                    <xsl:attribute name="width">0</xsl:attribute>
+                </glue>
+                <box>
+                    <xsl:attribute name="width">0</xsl:attribute>
+                </box>
+                <penalty>
+                    <xsl:attribute name="penalty">INF</xsl:attribute>
+                    <xsl:attribute name="break">prohibited</xsl:attribute>
+                </penalty>
+            </xsl:when>       
+            <xsl:otherwise>
+                <box>
+                    <xsl:variable name="word" select="normalize-space(substring-before($text, $separator))"/>
+                    <xsl:attribute name="width">
+                        <xsl:copy-of select="string-length($word) * 12" />
+                    </xsl:attribute>
+                    <xsl:value-of select="$word"/>
+                </box>
+                <glue>
+                    <xsl:attribute name="stretchability">
+                        <xsl:copy-of select="18" />
+                    </xsl:attribute>
+                    <xsl:attribute name="shrinkability">
+                        <xsl:copy-of select="0" />
+                    </xsl:attribute>
+                    <xsl:attribute name="width">
+                        <xsl:value-of select="$gluewidth" />
+                    </xsl:attribute>
+                </glue>
+                <xsl:call-template name="tokenize">
+                    <xsl:with-param name="text" select="substring-after($text, $separator)"/>
+                    <xsl:with-param name="doc_width" select="$doc_width"/>
+                    <xsl:with-param name="doc_align" select="$doc_align"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+        </xsl:when>
     </xsl:choose>
 </xsl:template>
 

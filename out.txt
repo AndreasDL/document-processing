@@ -188,6 +188,9 @@
     <box width="84">maximus</box>
     <glue stretchability="18" shrinkability="0" width="12"/>
     <box width="96">lacinia.</box>
+    <penalty penalty="INF" break="prohibited"/>
+    <glue width="0" stretchability="INF" shrinkability="0"/>
+    <penalty penalty="-INF" break="required"/>
   </paragraph>
   <paragraph align="centered">
     <box width="36">Nam</box>
@@ -410,6 +413,12 @@
     <glue stretchability="18" shrinkability="0" width="12"/>
     <box width="108">elementum</box>
     <glue stretchability="18" shrinkability="0" width="12"/>
+    <glue stretchability="18" shrinkability="0" width="0"/>
     <box width="96">feugiat.</box>
+    <glue stretchability="18" shrinkability="0" width="0"/>
+    <penalty penalty="0" break="optional"/>
+    <glue stretchability="-36" shrinkability="0" width="0"/>
+    <box width="0"/>
+    <penalty penalty="INF" break="prohibited"/>
   </paragraph>
 </document>
