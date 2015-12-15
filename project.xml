@@ -1,0 +1,21 @@
+<project>
+    <student id="01070034">
+        <first-name>Andreas</first-name>
+        <last-name>De Lille</last-name>
+    </student>
+    <solution>
+        <step>
+            <transformation>1-1.xsl</transformation>
+            <!--transformation>1-2.xsl</transformation>
+            <transformation>1-3.xsl</transformation>-->
+        </step>
+        <step fallback="false" />
+        <step>
+            <!--transformation>3-1.xsl</transformation>
+            <transformation>3-2.xsl</transformation>-->
+        </step>
+        <step>
+            <!--transformation>4.xsl</transformation>-->
+        </step>
+    </solution>
+</project>
