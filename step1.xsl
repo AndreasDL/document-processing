@@ -144,6 +144,7 @@
                     <xsl:attribute name="penalty">INF</xsl:attribute>
                     <xsl:attribute name="break">prohibited</xsl:attribute>
                 </penalty>
+                
                 <!--recursion -->
                 <xsl:call-template name="tokenize">
                     <xsl:with-param name="text" select="substring-after($text, $separator)"/>
