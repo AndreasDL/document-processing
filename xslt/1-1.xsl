@@ -175,26 +175,29 @@
 
     <xsl:for-each select="paragraph">
         <paragraph>
-        <xsl:if test="@align != ''">
-            <xsl:attribute name="align">
-                <xsl:value-of select="@align"/>
-            </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="@line-width != ''">
-            <xsl:attribute name="line-width">
-                <xsl:value-of select="@line-width"/>
-            </xsl:attribute>
-        </xsl:if>
-        <xsl:if test="@font-size != ''">
-            <xsl:attribute name="font-size">
-                <xsl:value-of select="@font-size" />
-            </xsl:attribute>
-        </xsl:if>
+            <xsl:if test="@align != ''">
+                <xsl:attribute name="align">
+                    <xsl:value-of select="@align"/>
+                </xsl:attribute>
+            </xsl:if>
+
+            <xsl:if test="@line-width != ''">
+                <xsl:attribute name="line-width">
+                    <xsl:value-of select="@line-width"/>
+                </xsl:attribute>
+            </xsl:if>
         
-        <xsl:call-template name="tokenize">
-            <xsl:with-param name="doc_width" select="$doc_gluewidth"/>
-            <xsl:with-param name="doc_align" select="$doc_align"/>
-        </xsl:call-template>
+            <xsl:if test="@font-size != ''">
+                <xsl:attribute name="font-size">
+                    <xsl:value-of select="@font-size" />
+                </xsl:attribute>
+            </xsl:if>
+            
+            <!--perform the tokenize operation -->
+            <xsl:call-template name="tokenize">
+                <xsl:with-param name="doc_width" select="$doc_gluewidth"/>
+                <xsl:with-param name="doc_align" select="$doc_align"/>
+            </xsl:call-template>
         
         </paragraph>
     </xsl:for-each>
