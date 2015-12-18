@@ -6,8 +6,8 @@
     <solution>
         <step>
             <transformation>1-1.xsl</transformation>
-            <transformation>1-2.xsl</transformation>
-            <!--transformation>1-3.xsl</transformation>-->
+            <transformation>2-1.xsl</transformation>
+            <!--transformation>2-2.xsl</transformation>-->
         </step>
         <step fallback="false" />
         <step>

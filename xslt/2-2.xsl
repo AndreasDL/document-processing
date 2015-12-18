@@ -25,7 +25,7 @@
             <xsl:with-param name="stop_index" select="$stop_index + 1"/>
             
             <xsl:with-param name="l_max" select="$l_max"/>
-            <xsl:with-param name="l_prev" select="$l_prev"/>
+            <xsl:with-param name="l_prev" select="$l_curr"/>
         </xsl:call-template>
     </xsl:when>
     <xsl:otherwise>
@@ -35,6 +35,8 @@
             <xsl:when test="$l_curr > $l_max">
                 
                 <xsl:variable name="last_word" select="./*[ position = $stop_index]"/>
+
+                <!--remove last glue-->
 
                 <!-- get ratio -->
                 <xsl:variable name="y_curr" select="sum( ./*[ position() >= $start_index and $stop_index > position() ]/@stretchability )"/>
@@ -84,10 +86,10 @@
                 <!--</xsl:when>
                 </xsl:choose>-->
 
-                <!-- heap size too big
+                <!-- heap size too big ->
                 <xsl:call-template name="calcBranch">
-                    <xsl:with-param name="start_index" select="$start_index + 1"/>
-                    <xsl:with-param name="stop_index" select="$start_index + 1"/>
+                    <xsl:with-param name="start_index" select="$stop_index + 1"/>
+                    <xsl:with-param name="stop_index" select="$stop_index + 1"/>
                     
                     <xsl:with-param name="l_max" select="$l_max"/>
                     <xsl:with-param name="l_prev" select="0"/>
