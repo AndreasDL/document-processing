@@ -18,23 +18,15 @@
     <xsl:variable name="curr_element_type" select="name($curr_element)" />
 
     <!-- new l, y, z values -->
-    <xsl:variable name="l_curr">
-        <xsl:choose>
-            <!-- things only change when the current element type is glue -->
-            <xsl:when test="$curr_element_type = 'glue'">
+    <xsl:choose>
+        <!-- things only change when the current element type is glue -->
+        <xsl:when test="$curr_element_type = 'glue'">
+
+            <xsl:variable name="l_curr">
                 <xsl:value-of select="$l_prev + $curr_element/@width"/>
-            </xsl:when>
-
-            <xsl:otherwise>    
-                <xsl:value-of select="$l_prev"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
-
-    <xsl:variable name="y_curr">
-        <xsl:choose>
-            <!-- things only change when the current element type is glue -->
-            <xsl:when test="$curr_element_type = 'glue'">
+            </xsl:variable>
+            
+            <xsl:variable name="y_curr">
                 <xsl:choose>
                     <!-- infinity is only 'kinda' supported -->
                     <xsl:when test="$curr_element/@stretchability = 'INF'">
@@ -49,27 +41,28 @@
                         <xsl:value-of select="$y_prev + $curr_element/@stretchability"/>
                     </xsl:otherwise>
                 </xsl:choose>
-            </xsl:when>
+            </xsl:variable>
 
-            <xsl:otherwise>
-                <xsl:value-of select="$y_prev"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
-
-    <xsl:variable name="z_curr">
-        <xsl:choose>
-        <!-- things only change when the current element type is glue -->
-            <xsl:when test="$curr_element_type = 'glue'">
+            <xsl:variable name="z_curr">
                 <xsl:value-of select="$z_prev + $curr_element/@shrinkability"/>
-            </xsl:when>
+            </xsl:variable>
+        </xsl:when>
+        
+        <!-- nothing changes -->
+        <xsl:otherwise>    
+            <xsl:variable name="l_curr">
+                <xsl:value-of select="$l_prev"/>
+            </xsl:variable>
 
-            <!-- nothing changes -->
-            <xsl:otherwise>   
+            <xsl:variable name="y_curr">
+                <xsl:value-of select="$y_prev"/>
+            </xsl:variable>
+
+            <xsl:variable name="z_curr">
                 <xsl:value-of select="$z_prev"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
+            </xsl:variable>
+        </xsl:otherwise>
+    </xsl:choose>
 
     <!-- fix ratio -->
     <xsl:variable name="ratio">
@@ -117,9 +110,6 @@
     </xsl:variable>
 
     <!-- fix the cost -->
-
-    <!-- stolen with pride from http://stackoverflow.com/questions/804421/how-can-i-calculate-the-absolute-value-of-a-number-in-xslt -->
-    <xsl:variable name="abs_ratio" select=" $ratio*($ratio >=0) - $ratio*($ratio &lt; 0)"/>
     <xsl:variable name="cost">
         <xsl:choose>
             <!--
@@ -134,6 +124,9 @@
             </xsl:when> 
 
             <!-- else: formula -->
+
+            <!-- stolen with pride from http://stackoverflow.com/questions/804421/how-can-i-calculate-the-absolute-value-of-a-number-in-xslt -->
+            <xsl:variable name="abs_ratio" select=" $ratio*($ratio >=0) - $ratio*($ratio &lt; 0)"/>
             <xsl:otherwise>
                 <xsl:value-of select="round(100 * $abs_ratio*$abs_ratio*$abs_ratio)"/>
             </xsl:otherwise>
