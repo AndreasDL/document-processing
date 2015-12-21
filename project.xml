@@ -4,7 +4,7 @@
         <last-name>De Lille</last-name>
     </student>
     <solution>
-        <step fallback="false">
+        <step>
             <transformation>1-1.xsl</transformation>
         </step>
         <step fallback="true">
@@ -15,7 +15,7 @@
             <transformation>3-1.xsl</transformation>
         </step>
         <step fallback="false"><!-- fallback has no use here :D -->
-            <transformation>4.xsl</transformation>
+            <transformation>4-1.xsl</transformation>
         </step>
     </solution>
 </project>

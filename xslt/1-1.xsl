@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output encoding="UTF-8" omit-xml-declaration="no" indent="yes"/>
 
-<!--this forst step of the Tex linebreaking algorithm splits the text into words and then places these words in boxes, add glue en penalties according to the alignment. Note that this code is written in xslt, by which I mean that this code is far from clean. To ensure that you remain happy and positive, I present to you this code piglet:
+<!--this first step of the Tex linebreaking algorithm splits the text into words and then places these words in boxes, add glue en penalties according to the alignment. Note that this code is written in xslt, by which I mean that this code is far from clean. To ensure that you remain happy and positive, I present to you this code piglet:
 
     _._ _..._ .-',     _.._(`))
    '-. `     '  /-._.-'    ',/
