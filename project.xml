@@ -4,18 +4,18 @@
         <last-name>De Lille</last-name>
     </student>
     <solution>
-        <step>
+        <step fallback="false">
             <transformation>1-1.xsl</transformation>
+        </step>
+        <step fallback="true">
             <transformation>2-1.xsl</transformation>
             <transformation>2-2.xsl</transformation>
         </step>
-        <step fallback="false" />
-        <step>
-            <!--transformation>3-1.xsl</transformation>
-            <transformation>3-2.xsl</transformation>-->
+        <step fallback="true">
+            <transformation>3-1.xsl</transformation>
         </step>
-        <step>
-            <!--transformation>4.xsl</transformation>-->
+        <step fallback="false"><!-- fallback has no use here :D -->
+            <transformation>4.xsl</transformation>
         </step>
     </solution>
 </project>
