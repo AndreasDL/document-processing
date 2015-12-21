@@ -38,11 +38,10 @@
         </rect>
 
         <!-- g -->
-        <xsl:for-each select="paragraph">
-            <xsl:call-template name="convertPara">
-                <xsl:with-param name="index" select="1"/>
-            </xsl:call-template>
-        </xsl:for-each>
+        <xsl:call-template name="convertPara">
+            <xsl:with-param name="index" select="1"/>
+            <xsl:with-param name="y_para" select="0"/>
+        </xsl:call-template>
     </svg>
 </xsl:template>
 
@@ -101,11 +100,11 @@
 
 <xsl:template name="convertPara">
     <xsl:param name="index"/>
-    
+    <xsl:param name="y_para"/>
+
     <!-- get paragraph -->
     <xsl:variable name="curr_paragraph" select="/document/paragraph[position() = $index]"/>
-    <xsl:variable name="y_para" select="0"/>
-
+    
     <!-- font-size overriden ? -->
     <xsl:variable name="font_size">
         <xsl:choose>
@@ -136,7 +135,7 @@
         </xsl:attribute>
     
         <!-- convert the lines -->
-        <xsl:for-each select="line">
+        <xsl:for-each select="$curr_paragraph/line">
             <text>
                 <xsl:call-template name="convertLine">
                     <xsl:with-param name="x_curr" select="0"/>
@@ -146,6 +145,14 @@
             </text>
         </xsl:for-each>
     </g>
+
+    <xsl:variable name="para_count" select="count(/document/paragraph[*])"/>
+    <xsl:if test="$para_count > $index">
+        <xsl:call-template name="convertPara">
+            <xsl:with-param name="index" select="$index + 1"/>
+            <xsl:with-param name="y_para" select="$y_para + (count($curr_paragraph/line[*]) * $font_size) + $font_size * 0.5"/>
+        </xsl:call-template>
+    </xsl:if>
 </xsl:template>
 
 <xsl:template name="convertLine">
