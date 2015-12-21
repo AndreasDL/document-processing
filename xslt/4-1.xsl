@@ -35,17 +35,15 @@
             <xsl:attribute name="height">
                 <xsl:value-of select="$height"/>
             </xsl:attribute>
-
-            <!-- g -->
-            <xsl:for-each select="paragraph">
-                <xsl:call-template name="convertPara">
-                    <xsl:with-param name="index" select="1"/>
-                    <xsl:with-param name="y_prev" select="0"/>
-                </xsl:call-template>
-            </xsl:for-each>
         </rect>
-    </svg>
 
+        <!-- g -->
+        <xsl:for-each select="paragraph">
+            <xsl:call-template name="convertPara">
+                <xsl:with-param name="index" select="1"/>
+            </xsl:call-template>
+        </xsl:for-each>
+    </svg>
 </xsl:template>
 
 <xsl:template name="getHeightRecursion">
@@ -102,11 +100,11 @@
 </xsl:template>
 
 <xsl:template name="convertPara">
-    <xsl:variable name="index"/>
-    <xsl:variable name="y_prev"/>
-
+    <xsl:param name="index"/>
+    
     <!-- get paragraph -->
     <xsl:variable name="curr_paragraph" select="/document/paragraph[position() = $index]"/>
+    <xsl:variable name="y_para" select="0"/>
 
     <!-- font-size overriden ? -->
     <xsl:variable name="font_size">
@@ -127,7 +125,7 @@
                 <xsl:value-of select="0"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="y_prev + $font_size * 0.5"/>
+                <xsl:value-of select="$y_para + $font_size * 0.5 "/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:variable>
@@ -136,12 +134,13 @@
         <xsl:attribute name="style">
             <xsl:value-of select="concat('font-size:' , $font_size , ';')"/>
         </xsl:attribute>
+    
         <!-- convert the lines -->
         <xsl:for-each select="line">
             <text>
                 <xsl:call-template name="convertLine">
                     <xsl:with-param name="x_curr" select="0"/>
-                    <xsl:with-param name="y" select="$y_new"/>
+                    <xsl:with-param name="y" select="$y_new + (count(preceding-sibling::*)+1) * $font_size "/>
                     <xsl:with-param name="index" select="1"/>
                 </xsl:call-template>
             </text>
