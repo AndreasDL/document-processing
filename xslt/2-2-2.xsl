@@ -98,6 +98,10 @@
         <xsl:param name="y_prev"/>
         <xsl:param name="z_prev"/>
         
+        <xsl:variable name="start_element" select="./*[position() = $start_index]"/>
+        <xsl:variable name="stop_element"  select="./*[position() = $stop_index]"/>
+        <xsl:variable name="stop_element_type" select="name($stop_element)"/>
+
         <xsl:choose>
             
             <!-- We should start at the first box after the previous breakpoint (or on the first line),
@@ -123,9 +127,9 @@
                     <xsl:choose>
                         
                         <!-- If the current element (at start_index $stop_index) is a glue, add the width of this element -->
-                        <xsl:when test="name(./*[position() = $stop_index]) = 'glue'
-                            or name(./*[position() = $stop_index]) = 'box'">
-                            <xsl:value-of select="$l_prev + ./*[position() = $stop_index]/@width"/>
+                        <xsl:when test="$stop_element_type = 'glue'
+                            or $stop_element_type = 'box'">
+                            <xsl:value-of select="$l_prev + $stop_element/@width"/>
                         </xsl:when>
                         
                         <!-- If the current element (at start_index $stop_index) is neither a glue or a box, the value will stay the same -->
@@ -140,22 +144,22 @@
                     <xsl:choose>
                         
                         <!-- If the current element (at start_index $stop_index) is a glue, add the stretchability -->
-                        <xsl:when test="name(./*[position() = $stop_index]) = 'glue'">
+                        <xsl:when test="$stop_element_type = 'glue'">
                             <xsl:choose>
                                 
                                 <!-- When adding INF, the value is hard coded to 'INF' -->
-                                <xsl:when test="./*[position() = $stop_index]/@stretchability = 'INF'">
+                                <xsl:when test="$stop_element/@stretchability = 'INF'">
                                     <xsl:value-of select="'INF'"/>
                                 </xsl:when>
                                 
                                 <!-- When adding -INF, the value is hard coded to '-INF' -->
-                                <xsl:when test="./*[position() = $stop_index]/@stretchability = '-INF'">
+                                <xsl:when test="$stop_element/@stretchability = '-INF'">
                                     <xsl:value-of select="'-INF'"/>
                                 </xsl:when>
                                 
                                 <!-- Otherwise, if the glue has a numerical stretchability, calculate the sum... -->
                                 <xsl:otherwise>
-                                    <xsl:value-of select="$y_prev + ./*[position() = $stop_index]/@stretchability"/>
+                                    <xsl:value-of select="$y_prev + $stop_element/@stretchability"/>
                                 </xsl:otherwise>
                                 
                             </xsl:choose>
@@ -173,8 +177,8 @@
                     <xsl:choose>
                         
                         <!-- If the current element (at start_index $stop_index) is a glue, add the shrinkability -->
-                        <xsl:when test="name(./*[position() = $stop_index]) = 'glue'">
-                            <xsl:value-of select="$z_prev + ./*[position() = $stop_index]/@shrinkability"/>
+                        <xsl:when test="$stop_element_type = 'glue'">
+                            <xsl:value-of select="$z_prev + $stop_element/@shrinkability"/>
                         </xsl:when>
                         
                         <!-- If the current element (at start_index $stop_index) is not a glue, the value will stay the same -->
@@ -229,7 +233,7 @@
                     <xsl:choose>
                         
                         <!-- When the ratio is 0 or the penalty -INF, set the cost to -INF -->
-                        <xsl:when test="$ratio = 0 or ./*[position() = $stop_index]/@penalty = '-INF'">
+                        <xsl:when test="$ratio = 0 or $stop_element/@penalty = '-INF'">
                             <!--<xsl:value-of select="'-INF'"/>-->
                             <!-- A cost of -INF will cause that a random branch is chosen at the end of the paragraph
                                 (for example, 5 - INF is the same as 1 - INF). Therefore a value of 0 is chosen instead of -INF. -->
@@ -255,8 +259,8 @@
                         
                         <!-- We will only write a branch if we are at an optional or required break
                             AND the ratio is not 'negative' or NaN... -->
-                        <xsl:when test="(./*[position() = $stop_index]/@break = 'required'
-                            or ./*[position() = $stop_index]/@break = 'optional')
+                        <xsl:when test="($stop_element/@break = 'required'
+                            or $stop_element/@break = 'optional')
                             and $ratio != 'NaN' and $ratio != 'negative'
                             and $stop_index != $start_index">
                             <xsl:value-of select="1"/>
@@ -313,7 +317,7 @@
                 <xsl:choose>
                 
                     <!-- Continue with the recursion if we're not at the end of the paragraph... -->
-                    <xsl:when test="0 > $ratio or $ratio = 'negative' or ./*[position() = $stop_index]/@break = 'required'">
+                    <xsl:when test="0 > $ratio or $ratio = 'negative' or $stop_element/@break = 'required'">
                         
                         <!-- If no new next breakpoint was enstop_indexed, we are at the end of the paragraph ==> Stop -->
                         <xsl:if test="not($new_break = -1)">
@@ -401,8 +405,8 @@
                                         <xsl:choose>
                                             
                                             <!-- If the current element has an optional or required break, this is the new_break start_index -->
-                                            <xsl:when test="(./*[position() = $stop_index]/@break = 'optional'
-                                                or ./*[position() = $stop_index]/@break = 'required')"> 
+                                            <xsl:when test="($stop_element/@break = 'optional'
+                                                or $stop_element/@break = 'required')"> 
                                                 <!--and $stop_index &gt; $start_index">-->
                                                 <xsl:value-of select="$stop_index"/>
                                             </xsl:when>

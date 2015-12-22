@@ -77,7 +77,7 @@
 
     <xsl:choose>
         <!-- skip elements before the first box of the paragraph, they represent whitespace that doesn't matter -->
-        <xsl:when test="$start_index != 1 and $start_element_type != 'box'">
+        <xsl:when test="$start_index != 1 and name(./*[position() = $start_index]) != 'box'">
             <xsl:call-template name="calcBranch">
                 <xsl:with-param name="l_max" select="$l_max"/>
 
