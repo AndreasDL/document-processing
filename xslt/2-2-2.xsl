@@ -195,12 +195,12 @@
                     <xsl:choose>
                         
                         <!-- When l_prev equals the l_max, the ratio is 0... -->
-                        <xsl:when test="$l_max - $l_curr = 0">
+                        <xsl:when test="$l_max = $l_curr">
                             <xsl:value-of select="0"/>
                         </xsl:when>
                         
                         <!-- l_prev is smaller than the l_max... -->
-                        <xsl:when test="$l_curr &lt; $l_max">
+                        <xsl:when test="$l_max > $l_curr">
                             <xsl:choose>
                                 
                                 <!-- If the stretchabilities are infinite, the ratio will be 0... -->
@@ -223,7 +223,7 @@
                         
                         <!-- When l_prev is greater than the l_max, the ratio will be negative.
                             For simplicity reasons, this will not be calculated and a value of 'negative' is chosen instead. -->
-                        <xsl:when test="$l_curr &gt; $l_max">
+                        <xsl:when test="$l_curr > $l_max">
                             <xsl:value-of select="'negative'"/>
                         </xsl:when>
                         
@@ -319,7 +319,7 @@
                 <xsl:choose>
                 
                     <!-- Continue with the recursion if we're not at the end of the paragraph... -->
-                    <xsl:when test="$ratio &lt; 0 or $ratio = 'negative' or $nodes[position() = $stop_index]/@break = 'required'">
+                    <xsl:when test="0 > $ratio or $ratio = 'negative' or $nodes[position() = $stop_index]/@break = 'required'">
                         
                         <!-- If no new next breakpoint was enstop_indexed, we are at the end of the paragraph ==> Stop -->
                         <xsl:if test="not($new_break = -1)">
