@@ -196,10 +196,33 @@
             
             <!-- recursion -->
             <xsl:choose>
+                <!-- not at end of paragraph -->
+                <xsl:when test="not(0 > $ratio or $stop_element/@break = 'required')">
+                    <xsl:call-template name="create_branches">
+                        <xsl:with-param name="l_max" select="$l_max"/>
+                        
+                        <xsl:with-param name="start_index" select="$start_index"/>
+                        <xsl:with-param name="stop_index" select="$stop_index + 1"/>
+                        <xsl:with-param name="break_index">
+                            <xsl:choose>
+                                <xsl:when test="$break_index = 0 and ($stop_element/@break = 'optional' or $stop_element/@break = 'required')"> 
+                                    <xsl:value-of select="$stop_index"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="$break_index"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:with-param>
+                 
+                        <!-- update l,y,z values -->
+                        <xsl:with-param name="l_prev" select="$l_curr"/>
+                        <xsl:with-param name="y_prev" select="$y_curr"/>
+                        <xsl:with-param name="z_prev" select="$z_curr"/>
+                    </xsl:call-template>
+                </xsl:when>                            
+
                 <!-- required break => end of paragraph -->
-                <xsl:when test="(0 > $ratio or $stop_element/@break = 'required')">
-                    <!-- break needs to happen -->
-                    <xsl:if test="$break_index != 0">
+                <xsl:when test="$break_index != 0">
                         <xsl:call-template name="create_branches">
                             <xsl:with-param name="l_max" select="$l_max"/>
                             
@@ -244,35 +267,10 @@
                                 </xsl:choose>
                             </xsl:with-param>
                         </xsl:call-template>   
-                    </xsl:if>
+                </xsl:when>
 
-                    <!-- else => no recursion !! -->
-                </xsl:when>                            
-
-                <!-- not at end of paragraph -->
-                <xsl:otherwise>                        
-                    <xsl:call-template name="create_branches">
-                        <xsl:with-param name="l_max" select="$l_max"/>
-                        
-                        <xsl:with-param name="start_index" select="$start_index"/>
-                        <xsl:with-param name="stop_index" select="$stop_index + 1"/>
-                        <xsl:with-param name="break_index">
-                            <xsl:choose>
-                                <xsl:when test="$break_index = 0 and ($stop_element/@break = 'optional' or $stop_element/@break = 'required')"> 
-                                    <xsl:value-of select="$stop_index"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:value-of select="$break_index"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:with-param>
-                 
-                        <!-- update l,y,z values -->
-                        <xsl:with-param name="l_prev" select="$l_curr"/>
-                        <xsl:with-param name="y_prev" select="$y_curr"/>
-                        <xsl:with-param name="z_prev" select="$z_curr"/>
-                    </xsl:call-template>
-                </xsl:otherwise>
+                <!-- else => no recursion !! -->                      
+                <xsl:otherwise/>
 
             </xsl:choose>
         
