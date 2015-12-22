@@ -52,25 +52,24 @@
 <!-- This is where the magic happens -->
 <xsl:template name="create_branches">
     <xsl:param name="l_max"/>
+
+    <xsl:param name="l_prev"/>
+    <xsl:param name="y_prev"/>
+    <xsl:param name="z_prev"/>
     
     <xsl:param name="start_index"/>
     <xsl:param name="stop_index"/>
 
     <xsl:param name="curr_break"/>
     <xsl:param name="prev_break"/>
-
-    <xsl:param name="l_prev"/>
-    <xsl:param name="y_prev"/>
-    <xsl:param name="z_prev"/>
     
     <!-- readability++ -->
     <xsl:variable name="stop_element"  select="./*[position() = $stop_index]"/>
     <xsl:variable name="stop_element_type" select="name($stop_element)"/>
 
     <xsl:choose>
-        
         <!-- skip all whitespace in front of first box of a paragraph -->
-        <xsl:when test="$start_index != 1 and name(./*[position() = $start_index]) != 'box'">
+        <xsl:when test="name(./*[position() = $start_index]) != 'box' and $start_index != 1">
             <xsl:call-template name="create_branches">
                 <xsl:with-param name="l_max" select="$l_max"/>
                 
@@ -179,7 +178,7 @@
                 <xsl:choose>
                     
                     <!-- When the ratio is 0 or the penalty -INF, the cost is -INF -->
-                    <xsl:when test="$ratio = 0 or $stop_element/@penalty = '-INF'">
+                    <xsl:when test="$stop_element/@penalty = '-INF' or $ratio = 0">
                         <!-- -INF cost => picks a random branch since X - INF = -INF , fix this by using 0-->
                         <xsl:value-of select="0"/>
                     </xsl:when>
@@ -198,7 +197,7 @@
             </xsl:variable>
             
             <!-- write branch when needed -->
-            <xsl:if test="$stop_element/@break != 'prohibited' and $stop_index != $start_index and $ratio != 'NaN' and $ratio > 0 ">
+            <xsl:if test="$ratio != 'NaN' and $ratio > 0 and $stop_index != $start_index and $stop_element/@break != 'prohibited'">
                 <xsl:call-template name="writeBranch">
                     <xsl:with-param name="ratio" select="$ratio"/>
                     <xsl:with-param name="cost" select="$cost"/>
@@ -215,6 +214,10 @@
                 <xsl:when test="$stop_element/@break != 'required' and not(0 > $ratio)">
                     <xsl:call-template name="create_branches">
                         <xsl:with-param name="l_max" select="$l_max"/>
+                        <!-- update l,y,z values -->
+                        <xsl:with-param name="l_prev" select="$l_curr"/>
+                        <xsl:with-param name="y_prev" select="$y_curr"/>
+                        <xsl:with-param name="z_prev" select="$z_curr"/>
                         
                         <xsl:with-param name="start_index" select="$start_index"/>
                         <xsl:with-param name="stop_index" select="$stop_index + 1"/>
@@ -230,11 +233,6 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:with-param>
-                 
-                        <!-- update l,y,z values -->
-                        <xsl:with-param name="l_prev" select="$l_curr"/>
-                        <xsl:with-param name="y_prev" select="$y_curr"/>
-                        <xsl:with-param name="z_prev" select="$z_curr"/>
                     </xsl:call-template>
                 </xsl:when>                            
 
