@@ -11,12 +11,14 @@
 
 <!-- this template matches the paragraph element -->
 <xsl:template match="paragraph">
+
+
     <xsl:copy>
         <xsl:apply-templates select="@*"/>
         
         <!-- copy the content of step 1 between the content tags -->
         <content>
-            <xsl:copy-of select="node()"/>
+            <xsl:copy-of select="current()/*"/>
         </content>
         
         <!-- place branches tags and calculate branches cost and ratio -->
@@ -235,7 +237,7 @@
                 <xsl:when test="0 > $ratio or $stop_element/@break = 'required'">
                     
                     <!-- If no new next breakpoint was enstop_indexed, we are at the end of the paragraph ==> Stop -->
-                    <xsl:if test="not($new_break = -1)">
+                    <xsl:if test="$new_break != -1">
                         <xsl:call-template name="create_branches">
                             <xsl:with-param name="l_max" select="$l_max"/>
                             
