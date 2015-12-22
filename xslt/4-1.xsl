@@ -2,50 +2,6 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="xml" indent="yes" doctype-public="-//W3C//DTD SVG 1.0//EN" doctype-system="http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" media-type="image/svg" />
 
-<xsl:template match="document">
-    <!-- get height -->
-    <xsl:variable name="height">
-        <xsl:call-template name="getHeightRecursion">
-            <xsl:with-param name="index" select="0"/>
-            <xsl:with-param name="prev_height" select="0"/>
-        </xsl:call-template>
-    </xsl:variable>
-
-    <!-- fix the declaration -->
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-        <xsl:attribute name="width">
-            <xsl:value-of select="/document/@line-width"/>
-        </xsl:attribute>
-        
-        <xsl:attribute name="height">
-            <xsl:value-of select="$height"/>
-        </xsl:attribute>
-
-        <!-- hardcoded from example -->
-        <xsl:attribute name="preserveAspectRatio">xMidYMid meet</xsl:attribute>
-        <xsl:attribute name="zoomAndPan">magnify</xsl:attribute>
-        <xsl:attribute name="version">1.0</xsl:attribute>
-        <xsl:attribute name="contentScriptType">text/ecmascript</xsl:attribute>
-        <xsl:attribute name="contentStyleType">text/css</xsl:attribute>
-
-        <!--rect-->
-        <rect style="fill:none;stroke-width:1;stroke:rgb(0,0,0);">            
-            <xsl:attribute name="height">
-                <xsl:value-of select="$height"/>
-            </xsl:attribute>
-            <xsl:attribute name="width">
-                <xsl:value-of select="/document/@line-width"/>
-            </xsl:attribute>
-        </rect>
-
-        <!--start converting -->
-        <xsl:call-template name="convertPara">
-            <xsl:with-param name="index" select="1"/>
-            <xsl:with-param name="y_para" select="0"/>
-        </xsl:call-template>
-    </svg>
-</xsl:template>
-
 <xsl:template name="getHeightRecursion">
     <xsl:param name="prev_height"/>
     <xsl:param name="index" />
@@ -99,6 +55,51 @@
     </xsl:choose>
 </xsl:template>
 
+<xsl:template match="document">
+
+    <!-- get height -->
+    <xsl:variable name="height">
+        <xsl:call-template name="getHeightRecursion">
+            <xsl:with-param name="index" select="0"/>
+            <xsl:with-param name="prev_height" select="0"/>
+        </xsl:call-template>
+    </xsl:variable>
+
+    <!-- fix the declaration -->
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <!-- hardcoded from example -->
+        <xsl:attribute name="preserveAspectRatio">xMidYMid meet</xsl:attribute>
+        <xsl:attribute name="zoomAndPan">magnify</xsl:attribute>
+        <xsl:attribute name="version">1.0</xsl:attribute>
+        <xsl:attribute name="contentScriptType">text/ecmascript</xsl:attribute>
+        <xsl:attribute name="contentStyleType">text/css</xsl:attribute>
+        
+        <xsl:attribute name="width">
+            <xsl:value-of select="/document/@line-width"/>
+        </xsl:attribute>
+        
+        <xsl:attribute name="height">
+            <xsl:value-of select="$height"/>
+        </xsl:attribute>
+
+        <!--rect-->
+        <rect style="fill:none;stroke-width:1;stroke:rgb(0,0,0);">            
+            <xsl:attribute name="height">
+                <xsl:value-of select="$height"/>
+            </xsl:attribute>
+            <xsl:attribute name="width">
+                <xsl:value-of select="/document/@line-width"/>
+            </xsl:attribute>
+        </rect>
+
+        <!--start converting -->
+        <xsl:call-template name="convertPara">
+            <xsl:with-param name="index" select="1"/>
+            <xsl:with-param name="y_para" select="0"/>
+        </xsl:call-template>
+    </svg>
+</xsl:template>
+
 <xsl:template name="convertPara">
     <xsl:param name="index"/>
     <xsl:param name="y_para"/>
@@ -142,6 +143,7 @@
                     <xsl:with-param name="x_curr" select="0"/>
                     <xsl:with-param name="y" select="$y_new + (count(preceding-sibling::*)+1) * $font_size "/>
                     <xsl:with-param name="index" select="1"/>
+                    <xsl:with-param name="line_count" select="count(./*)"/>
                 </xsl:call-template>
             </text>
         </xsl:for-each>
@@ -161,6 +163,7 @@
     <xsl:param name="x_curr"/>
     <xsl:param name="y"/>
     <xsl:param name="index"/>
+    <xsl:param name="line_count"/>
 
     <xsl:variable name="ratio" select="@ratio"/>
     <xsl:variable name="curr_element" select="./*[position() = $index]"/>
@@ -189,11 +192,12 @@
     </xsl:if>
 
     <!-- recursion -->
-    <xsl:if test="count(./*) > $index">
+    <xsl:if test="$line_count > $index">
         <xsl:call-template name="convertLine">
-            <xsl:with-param name="index" select="$index + 1"/>
             <xsl:with-param name="y" select="$y"/>
-            
+            <xsl:with-param name="line_count" select="$line_count"/>
+            <xsl:with-param name="index" select="$index + 1"/>
+
             <xsl:with-param name="x_curr">
                 <xsl:choose>
                     <xsl:when test="$curr_element_type = 'glue'">
@@ -206,7 +210,6 @@
             </xsl:with-param>
         </xsl:call-template>
     </xsl:if>
-
 </xsl:template>
 
 </xsl:stylesheet>
