@@ -3,19 +3,71 @@
 <xsl:output encoding="UTF-8" omit-xml-declaration="no" indent="yes"/>
 
 <!-- step 2, please run the preprocessing step in 2-1.xsl first -->
+<xsl:template match="document|@*">
+    <xsl:copy>
+        <xsl:apply-templates select="@*"/>
+        <xsl:apply-templates select="paragraph">
+            <xsl:variable name="doc_line_width" select="@line-width"/>
+        </xsl:apply-templates>
+    </xsl:copy>
+</xsl:template>
+
+<xsl:template match="document/paragraph">
+    <xsl:param name="doc_line_width"/>
+
+    <!-- fix the content part -->
+    <xsl:copy>
+        <!-- attribute fix one-liner -->
+        <xsl:apply-templates select="@*"/>
+
+        <!--fix content == copy of original data -->
+        <content>
+            <xsl:copy-of select="node()"/>
+        </content>
+
+        <!-- fix the branches -->
+        <branches>
+            <xsl:call-template name="calcBranch">
+                <!--line runs from start_index until the stop_index-->
+                <xsl:with-param name="start_index" select="1"/>
+                <xsl:with-param name="stop_index" select="1"/>
+
+                <!-- keep track of breaks -->
+                <xsl:with-param name="break_prev" select="0"/>
+                <xsl:with-param name="break_curr" select="-1"/>
+
+                <!--check if line-width is overridden by the paragraph element -->
+                <xsl:with-param name="l_max">
+                    <xsl:choose>
+                        <xsl:when test="@line-width != ''">
+                            <xsl:value-of select="@line-width"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="$doc_line_width"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:with-param>
+
+                <!-- init to zero -->
+                <xsl:with-param name="l_prev" select="0"/>
+                <xsl:with-param name="y_prev" select="0"/>
+                <xsl:with-param name="z_prev" select="0"/>
+            </xsl:call-template>
+        </branches>
+    </xsl:copy>
+</xsl:template>
 
 <!-- Fair warning: looking at this template might cause permanent eye damage -->
 <xsl:template name="calcBranch">
     <xsl:param name="l_max"/>
     <xsl:param name="start_index"/>
     <xsl:param name="stop_index"/>
+    <xsl:param name="break_prev"/>
+    <xsl:param name="break_curr"/>
 
     <xsl:param name="l_prev"/>
     <xsl:param name="y_prev"/>
     <xsl:param name="z_prev"/>
-
-    <xsl:param name="break_prev"/>
-    <xsl:param name="break_curr"/>
     
     <!-- init some basic params, readability++ -->
     <xsl:variable name="start_element_type" select="name(./*[position() = $start_index])"/>
@@ -31,7 +83,7 @@
 
                 <!-- inc indexes to jump over the element -->
                 <xsl:with-param name="start_index" select="$start_index + 1"/>
-                <xsl:with-param name="stop_index" select="$start_index + 1"/>
+                <xsl:with-param name="stop_index" select="$stop_index + 1"/>
                 <!-- reset l, y, z values -->
                 <xsl:with-param name="l_prev" select="0"/>
                 <xsl:with-param name="y_prev" select="0"/>
@@ -172,9 +224,18 @@
                         <xsl:value-of select="$ratio"/>
                     </xsl:attribute>
 
-                    <xsl:attribute name="cost">
-                        <xsl:value-of select="format-number($cost,'#')"/>
-                    </xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="$ratio = 0">                            
+                            <xsl:attribute name="cost">
+                                <xsl:value-of select="0"/>
+                            </xsl:attribute>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="cost">
+                                <xsl:value-of select="format-number($cost,'#')"/>
+                            </xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
 
                     <xsl:attribute name="start">
                         <xsl:value-of select="$start_index"/>
@@ -183,10 +244,14 @@
                     <xsl:attribute name="end">
                         <xsl:value-of select="$stop_index"/>
                     </xsl:attribute>
+
+                    <xsl:attribute name="previous">
+                        <xsl:value-of select="$break_prev"/>
+                    </xsl:attribute>
                 </branch>
             </xsl:if>
             
-            <xsl:variable name="break_element" select="./*[position() = $stop_index]"/>
+            <xsl:variable name="break_element" select="./*[position() = $break_curr]"/>
             <xsl:variable name="break_element_type" select="name($break_element)"/>
 
             <!-- recursion -->
@@ -280,61 +345,6 @@
 
         </xsl:otherwise>
     </xsl:choose>
-</xsl:template>
-
-<xsl:template match="document/paragraph">
-    <xsl:param name="doc_line_width"/>
-
-    <!-- fix the content part -->
-    <xsl:copy>
-        <!-- attribute fix one-liner -->
-        <xsl:apply-templates select="@*"/>
-
-        <!--fix content == copy of original data -->
-        <content>
-            <xsl:copy-of select="current()/*"/>
-        </content>
-
-        <!-- fix the branches -->
-        <branches>
-            <xsl:call-template name="calcBranch">
-                <!--check if line-width is overridden by the paragraph element -->
-                <xsl:with-param name="l_max">
-                    <xsl:choose>
-                        <xsl:when test="@line-width != ''">
-                            <xsl:value-of select="@line-width"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="$doc_line_width"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:with-param>
-
-                <!--line runs from start_index until the stop_index-->
-                <xsl:with-param name="start_index" select="1"/>
-                <xsl:with-param name="stop_index" select="1"/>
-
-                <!-- init to zero -->
-                <xsl:with-param name="l_prev" select="0"/>
-                <xsl:with-param name="y_prev" select="0"/>
-                <xsl:with-param name="z_prev" select="0"/>
-
-                <xsl:with-param name="break_prev" select="0"/>
-                <xsl:with-param name="break_curr" select="-1"/>
-
-            </xsl:call-template>
-        </branches>
-
-    </xsl:copy>
-</xsl:template>
-
-<xsl:template match="document|@*">
-    <xsl:copy>
-        <xsl:apply-templates select="@*"/>
-        <xsl:apply-templates select="paragraph">
-            <xsl:variable name="doc_line_width" select="@line-width"/>
-        </xsl:apply-templates>
-    </xsl:copy>
 </xsl:template>
 
 </xsl:stylesheet>
