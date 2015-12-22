@@ -177,12 +177,12 @@
                         <xsl:value-of select="0"/>
                     </xsl:when>
                     
-                    <!-- ratio < -1 or undef? => inf cost --> 
-                    <xsl:when test="$ratio = 'NaN' or -1 > number($ratio)">
+                    <!-- Set the cost to INF when the ratio is (-)INF, < -1 or 'NaN'... --> 
+                    <xsl:when test="-1 > number($ratio)">
                         <xsl:value-of select="'INF'"/>
                     </xsl:when>
                     
-                    <!-- calculate cost, ignore absolute value, (ratio < 0 is ignored later and will never show up in the output) -->
+                    <!-- In all other cases, calculate the cost... -->
                     <xsl:otherwise>
                         <xsl:value-of select="floor(100 * $ratio * $ratio * $ratio + 0.5)"/>
                     </xsl:otherwise>
@@ -191,7 +191,8 @@
             </xsl:variable>
             
             <xsl:if test="$stop_element/@break != 'prohibited'
-                        and $stop_index != $start_index and $ratio != 'NaN' and $ratio > 0 ">
+                        and $ratio != 'NaN' and $ratio > 0
+                        and $stop_index != $start_index">
                 <xsl:call-template name="writeBranch">
                     <xsl:with-param name="ratio" select="$ratio"/>
                     <xsl:with-param name="cost" select="$cost"/>
@@ -199,19 +200,22 @@
             </xsl:if>
             
             <!-- recursion -->
+            <!-- variables to pass -->
+
             <xsl:choose>
+            
+                <!-- Continue with the recursion if we're not at the end of the paragraph... -->
                 <xsl:when test="0 > $ratio or $stop_element/@break = 'required'">
                     
-                    <!-- no break point before => beginning of paragraph -->
+                    <!-- If no new next breakpoint was enstop_indexed, we are at the end of the paragraph ==> Stop -->
                     <xsl:if test="$break_index != 0">
                         <xsl:call-template name="create_branches">
                             <xsl:with-param name="l_max" select="$l_max"/>
                             
-                            <!-- continue one element after the break --> 
+                            <!-- Restart 1 element after the break before the previous start... --> 
                             <xsl:with-param name="start_index" select="$break_index + 1"/>
                             <xsl:with-param name="stop_index" select="$break_index + 1"/>
-
-                            <!-- reset break index -->
+                            
                             <xsl:with-param name="break_index" select="0"/>
                             
                             <!-- The element at 'break_index' might be the first element of a new set of branches.
