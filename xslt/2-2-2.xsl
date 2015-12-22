@@ -178,7 +178,7 @@
                     </xsl:when>
                     
                     <!-- Set the cost to INF when the ratio is (-)INF, < -1 or 'NaN'... --> 
-                    <xsl:when test="$ratio = 'NaN' or number($ratio) = 'NaN' or -1 > $ratio">
+                    <xsl:when test="$ratio = 'NaN' or -1 > $ratio">
                         <xsl:value-of select="'INF'"/>
                     </xsl:when>
                     
