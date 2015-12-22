@@ -33,7 +33,7 @@
                 <!-- break_index will store the first possible breakpoint enstop_indexed when calculating
                     branches. The next iteration will start at this start_index. It is set at -1 until the
                     next breakpoint is found. -->
-                <xsl:with-param name="break_index" select="-1"/>
+                <xsl:with-param name="break_index" select="0"/>
                 
                 <!-- The l_prev, y_prev and z_prev values are initialized at 0... -->
                 <xsl:with-param name="l_prev" select="0"/>
@@ -222,7 +222,7 @@
                 <xsl:when test="0 > $ratio or $stop_element/@break = 'required'">
                     
                     <!-- If no new next breakpoint was enstop_indexed, we are at the end of the paragraph ==> Stop -->
-                    <xsl:if test="$break_index != -1">
+                    <xsl:if test="$break_index != 0">
                         <xsl:call-template name="create_branches">
                             <xsl:with-param name="l_max" select="$l_max"/>
                             
@@ -230,7 +230,7 @@
                             <xsl:with-param name="start_index" select="$break_index + 1"/>
                             <xsl:with-param name="stop_index" select="$break_index + 1"/>
                             
-                            <xsl:with-param name="break_index" select="-1"/>
+                            <xsl:with-param name="break_index" select="0"/>
                             
                             <!-- The element at 'break_index' might be the first element of a new set of branches.
                                 Therefore, we initialize the l_prev value with the the current box or glue width if necessary. -->
@@ -287,7 +287,7 @@
                         
                         <xsl:with-param name="break_index">
                             <xsl:choose>
-                                <xsl:when test="$break_index = -1 and ($stop_element/@break = 'optional' or $stop_element/@break = 'required')"> 
+                                <xsl:when test="$break_index = 0 and ($stop_element/@break = 'optional' or $stop_element/@break = 'required')"> 
                                     <xsl:value-of select="$stop_index"/>
                                 </xsl:when>
                                 <xsl:otherwise>
