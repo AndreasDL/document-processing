@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-<xsl:output encoding="UTF-8" omit-xml-declaration="no" indent="yes"/>
+<xsl:output encoding="UTF-8" omit-xml-declaration="no" indent="no"/>
 
 <!-- preprocessing step for step 2. This step adds breakpoint information for each element that simplifies the calculate branches part (as was suggested by the teaching staff to a collegue of me). This code is written in xslt, and thus not clean therefore a code monkey is provided below to stop you from going to the dark side
 

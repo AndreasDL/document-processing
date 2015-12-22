@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-<xsl:output encoding="UTF-8" omit-xml-declaration="no" indent="yes"/>
+<xsl:output encoding="UTF-8" omit-xml-declaration="no" indent="no"/>
 
 <!-- step 2, please run the preprocessing step in 2-1.xsl first -->
 <xsl:template match="document|@*">
