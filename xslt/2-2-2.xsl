@@ -30,10 +30,10 @@
                 <xsl:with-param name="start_index" select="1"/>
                 <xsl:with-param name="stop_index" select="1"/>
                                 
-                <!-- new_break will store the first possible breakpoint enstop_indexed when calculating
+                <!-- break_index will store the first possible breakpoint enstop_indexed when calculating
                     branches. The next iteration will start at this start_index. It is set at -1 until the
                     next breakpoint is found. -->
-                <xsl:with-param name="new_break" select="-1"/>
+                <xsl:with-param name="break_index" select="-1"/>
                 
                 <!-- The l_prev, y_prev and z_prev values are initialized at 0... -->
                 <xsl:with-param name="l_prev" select="0"/>
@@ -63,7 +63,7 @@
     <xsl:param name="l_max"/>
     <xsl:param name="start_index"/>
     <xsl:param name="stop_index"/>
-    <xsl:param name="new_break"/>
+    <xsl:param name="break_index"/>
     <xsl:param name="l_prev"/>
     <xsl:param name="y_prev"/>
     <xsl:param name="z_prev"/>
@@ -80,29 +80,25 @@
                 <xsl:with-param name="l_max" select="$l_max"/>
                 <xsl:with-param name="start_index" select="$start_index + 1"/>
                 <xsl:with-param name="stop_index" select="$stop_index + 1"/>
-                <xsl:with-param name="new_break" select="$new_break"/>
+                <xsl:with-param name="break_index" select="$break_index"/>
                 <xsl:with-param name="l_prev" select="0"/>
                 <xsl:with-param name="y_prev" select="0"/>
                 <xsl:with-param name="z_prev" select="0"/>
             </xsl:call-template>
         </xsl:when>
         
-        <!-- If the start_index is at a box element, we can start (or continue) calculating branches starting from this element. -->
         <xsl:otherwise>
 
             <!-- Calculate the new l_prev value -->
             <xsl:variable name="l_curr">
                 <xsl:choose>
-                    
-                    <!-- If the current element (at start_index $stop_index) is a glue, add the width of this element -->
-                    <xsl:when test="$stop_element_type = 'glue'
-                        or $stop_element_type = 'box'">
-                        <xsl:value-of select="$l_prev + $stop_element/@width"/>
+                    <!-- penalty ==> nothing changes -->
+                    <xsl:when test="$stop_element_type = 'penalty'">
+                        <xsl:value-of select="$l_prev"/>
                     </xsl:when>
                     
-                    <!-- If the current element (at start_index $stop_index) is neither a glue or a box, the value will stay the same -->
                     <xsl:otherwise>
-                        <xsl:value-of select="$l_prev"/>
+                        <xsl:value-of select="$l_prev + $stop_element/@width"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
@@ -110,22 +106,16 @@
             <!-- Calculate the new y_prev value -->
             <xsl:variable name="y_curr">
                 <xsl:choose>
-                    
-                    <!-- infinity is not supported -->
                     <xsl:when test="$stop_element_type = 'glue'">
+                        <!-- infinity is not supported, when -INF or +INF set this value -->
                         <xsl:choose>
-                            <xsl:when test="$stop_element/@stretchability = 'INF'">
-                                <xsl:value-of select="'INF'"/>
-                            </xsl:when>
-
-                            <xsl:when test="$stop_element/@stretchability = '-INF'">
-                                <xsl:value-of select="'-INF'"/>
+                            <xsl:when test="number($stop_element/@stretchability) = 'NaN'">
+                                <xsl:value-of select="$stop_element/@stretchability"/>
                             </xsl:when>
                             
                             <xsl:otherwise>
                                 <xsl:value-of select="$y_prev + $stop_element/@stretchability"/>
                             </xsl:otherwise>
-                            
                         </xsl:choose>
                     </xsl:when>
                     
@@ -163,7 +153,7 @@
                         <xsl:choose>
                             
                             <!-- If the stretchabilities are infinite, the ratio will be 0... -->
-                            <xsl:when test="$y_curr = 'INF' or $y_curr = '-INF'">
+                            <xsl:when test="number($y_curr) = 'NaN'">
                                 <xsl:value-of select="0"/>
                             </xsl:when>
                             
@@ -203,7 +193,7 @@
                     </xsl:when>
                     
                     <!-- Set the cost to INF when the ratio is (-)INF, < -1 or 'NaN'... --> 
-                    <xsl:when test="$ratio = 'NaN' or $ratio = 'INF' or $ratio = '-INF' or -1 > $ratio">
+                    <xsl:when test="$ratio = 'NaN' or number($ratio) = 'NaN' or -1 > $ratio">
                         <xsl:value-of select="'INF'"/>
                     </xsl:when>
                     
@@ -232,23 +222,23 @@
                 <xsl:when test="0 > $ratio or $stop_element/@break = 'required'">
                     
                     <!-- If no new next breakpoint was enstop_indexed, we are at the end of the paragraph ==> Stop -->
-                    <xsl:if test="$new_break != -1">
+                    <xsl:if test="$break_index != -1">
                         <xsl:call-template name="create_branches">
                             <xsl:with-param name="l_max" select="$l_max"/>
                             
                             <!-- Restart 1 element after the break before the previous start... --> 
-                            <xsl:with-param name="start_index" select="$new_break + 1"/>
-                            <xsl:with-param name="stop_index" select="$new_break + 1"/>
+                            <xsl:with-param name="start_index" select="$break_index + 1"/>
+                            <xsl:with-param name="stop_index" select="$break_index + 1"/>
                             
-                            <xsl:with-param name="new_break" select="-1"/>
+                            <xsl:with-param name="break_index" select="-1"/>
                             
-                            <!-- The element at 'new_break' might be the first element of a new set of branches.
+                            <!-- The element at 'break_index' might be the first element of a new set of branches.
                                 Therefore, we initialize the l_prev value with the the current box or glue width if necessary. -->
                             <xsl:with-param name="l_prev">
                                 <xsl:choose>
-                                    <xsl:when test="name(./*[position() = $new_break]) = 'box'
-                                        or name(./*[position() = $new_break]) = 'glue'">
-                                        <xsl:value-of select="./*[position() = $new_break]/@width"/>
+                                    <xsl:when test="name(./*[position() = $break_index]) = 'box'
+                                        or name(./*[position() = $break_index]) = 'glue'">
+                                        <xsl:value-of select="./*[position() = $break_index]/@width"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:value-of select="0"/>
@@ -256,12 +246,12 @@
                                 </xsl:choose>
                             </xsl:with-param>
                             
-                            <!-- The element at 'new_break' might be the first element of a new set of branches.
+                            <!-- The element at 'break_index' might be the first element of a new set of branches.
                                 Therefore, we initialize the y_prev value with the the current glue stretchability if necessary. -->
                             <xsl:with-param name="y_prev">
                                 <xsl:choose>
-                                    <xsl:when test="name(/*[position() = $new_break]) = 'glue'">
-                                        <xsl:value-of select="./*[position() = $new_break]/@stretchability"/>
+                                    <xsl:when test="name(/*[position() = $break_index]) = 'glue'">
+                                        <xsl:value-of select="./*[position() = $break_index]/@stretchability"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:value-of select="0"/>
@@ -269,12 +259,12 @@
                                 </xsl:choose>
                             </xsl:with-param>
                             
-                            <!-- The element at 'new_break' might be the first element of a new set of branches.
+                            <!-- The element at 'break_index' might be the first element of a new set of branches.
                                 Therefore, we initialize the z_prev value with the the current glue shrinkability if necessary. -->
                             <xsl:with-param name="z_prev">
                                 <xsl:choose>
-                                    <xsl:when test="name(./*[position() = $new_break]) = 'glue'">
-                                        <xsl:value-of select="./*[position() = $new_break]/@shrinkability"/>
+                                    <xsl:when test="name(./*[position() = $break_index]) = 'glue'">
+                                        <xsl:value-of select="./*[position() = $break_index]/@shrinkability"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:value-of select="0"/>
@@ -295,15 +285,13 @@
                         <xsl:with-param name="start_index" select="$start_index"/>
                         <xsl:with-param name="stop_index" select="$stop_index + 1"/>
                         
-                        <xsl:with-param name="new_break">
+                        <xsl:with-param name="break_index">
                             <xsl:choose>
-                                <xsl:when test="$new_break = -1 and ($stop_element/@break = 'optional'
-                                            or $stop_element/@break = 'required')"> 
-                                            <!--and $stop_index &gt; $start_index">-->
-                                            <xsl:value-of select="$stop_index"/>
+                                <xsl:when test="$break_index = -1 and ($stop_element/@break = 'optional' or $stop_element/@break = 'required')"> 
+                                    <xsl:value-of select="$stop_index"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="$new_break"/>
+                                    <xsl:value-of select="$break_index"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:with-param>
@@ -312,7 +300,6 @@
                         <xsl:with-param name="l_prev" select="$l_curr"/>
                         <xsl:with-param name="y_prev" select="$y_curr"/>
                         <xsl:with-param name="z_prev" select="$z_curr"/>
-                       
                     </xsl:call-template>
                 </xsl:otherwise>
             </xsl:choose>
