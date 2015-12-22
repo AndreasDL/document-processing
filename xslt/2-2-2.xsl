@@ -169,11 +169,9 @@
             <xsl:variable name="cost">
                 <xsl:choose>
                     
-                    <!-- When the ratio is 0 or the penalty -INF, set the cost to -INF -->
+                    <!-- When the ratio is 0 or the penalty -INF, the cost is -INF -->
                     <xsl:when test="$ratio = 0 or $stop_element/@penalty = '-INF'">
-                        <!--<xsl:value-of select="'-INF'"/>-->
-                        <!-- A cost of -INF will cause that a random branch is chosen at the end of the paragraph
-                            (for example, 5 - INF is the same as 1 - INF). Therefore a value of 0 is chosen instead of -INF. -->
+                        <!-- -INF cost => picks a random branch since X - INF = -INF , fix this by using 0-->
                         <xsl:value-of select="0"/>
                     </xsl:when>
                     
@@ -182,7 +180,7 @@
                         <xsl:value-of select="'INF'"/>
                     </xsl:when>
                     
-                    <!-- calculate cost, ignore absolute value, (ratio < 0 is ignored later and will never show up in the output) -->
+                    <!-- calculate cost, ignore absolute value, (ratio < 0 is ignored anyway and will never show up in the output) -->
                     <xsl:otherwise>
                         <xsl:value-of select="floor(100 * $ratio * $ratio * $ratio + 0.5)"/>
                     </xsl:otherwise>
@@ -227,8 +225,6 @@
                                 </xsl:choose>
                             </xsl:with-param>
                             
-                            <!-- The element at 'break_index' might be the first element of a new set of branches.
-                                Therefore, we initialize the y_prev value with the the current glue stretchability if necessary. -->
                             <xsl:with-param name="y_prev">
                                 <xsl:choose>
                                     <xsl:when test="name(/*[position() = $break_index]) = 'glue'">
@@ -240,8 +236,6 @@
                                 </xsl:choose>
                             </xsl:with-param>
                             
-                            <!-- The element at 'break_index' might be the first element of a new set of branches.
-                                Therefore, we initialize the z_prev value with the the current glue shrinkability if necessary. -->
                             <xsl:with-param name="z_prev">
                                 <xsl:choose>
                                     <xsl:when test="name(./*[position() = $break_index]) = 'glue'">
@@ -302,8 +296,7 @@
         <xsl:choose>
             <xsl:when test="$ratio = 0">
                 <xsl:attribute name="cost">
-                    <!-- A cost of -INF will cause that a random branch is chosen at the end of the paragraph
-                (for example, 5 - INF is the same as 1 - INF). Therefore a value of 0 is chosen instead of -INF. -->
+                    <!-- -INF cost => picks a random branch since X - INF = -INF , fix this by using 0-->
                     <xsl:value-of select="0"/>
                 </xsl:attribute>
             </xsl:when>
