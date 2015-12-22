@@ -186,7 +186,8 @@
                     <!-- When l_prev is greater than the l_max, the ratio will be negative.
                         For simplicity reasons, this will not be calculated and a value of 'negative' is chosen instead. -->
                     <xsl:when test="$l_curr > $l_max">
-                        <xsl:value-of select="'negative'"/>
+                        <!--<xsl:value-of select="negative"/-->
+                        <xsl:value-of select="($l_max - ($l_curr)) div $z_curr"/>
                     </xsl:when>
                     
                 </xsl:choose>
@@ -219,7 +220,7 @@
             
             <xsl:if test="($stop_element/@break = 'required'
                         or $stop_element/@break = 'optional')
-                        and $ratio != 'NaN' and $ratio != 'negative'
+                        and $ratio != 'NaN' and $ratio > 0
                         and $stop_index != $start_index">
                 <xsl:call-template name="writeBranch">
                     <xsl:with-param name="ratio" select="$ratio"/>
@@ -231,7 +232,7 @@
             <xsl:choose>
             
                 <!-- Continue with the recursion if we're not at the end of the paragraph... -->
-                <xsl:when test="0 > $ratio or $ratio = 'negative' or $stop_element/@break = 'required'">
+                <xsl:when test="0 > $ratio or $stop_element/@break = 'required'">
                     
                     <!-- If no new next breakpoint was enstop_indexed, we are at the end of the paragraph ==> Stop -->
                     <xsl:if test="not($new_break = -1)">
