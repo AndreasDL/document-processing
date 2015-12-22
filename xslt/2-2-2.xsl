@@ -401,22 +401,10 @@
                                     
                                     <!-- If the new_break value, the next start_index, was not yet found (at an optional or required break),
                                         we will check if the 'current' stop_index value might be the new_break value... --> 
-                                    <xsl:when test="$new_break = -1">
-                                        <xsl:choose>
-                                            
-                                            <!-- If the current element has an optional or required break, this is the new_break start_index -->
-                                            <xsl:when test="($stop_element/@break = 'optional'
+                                    <xsl:when test="$new_break = -1 and ($stop_element/@break = 'optional'
                                                 or $stop_element/@break = 'required')"> 
                                                 <!--and $stop_index &gt; $start_index">-->
                                                 <xsl:value-of select="$stop_index"/>
-                                            </xsl:when>
-                                            
-                                            <!-- Otherwise, the new_break value remains the same (-1) -->
-                                            <xsl:otherwise>
-                                                <xsl:value-of select="$new_break"/>
-                                            </xsl:otherwise>
-                                            
-                                        </xsl:choose>
                                     </xsl:when>
                                     
                                     <!-- If the new_break value has already been set, keep the value... -->
