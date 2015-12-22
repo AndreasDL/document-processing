@@ -27,7 +27,7 @@
             
             <!-- perform operations on paragraph elements -->
             <xsl:apply-templates select="paragraph">
-                <xsl:with-param name="linewidth" select="@line-width"/>
+                <xsl:with-param name="l_max" select="@line-width"/>
             </xsl:apply-templates>
             
         </xsl:copy>
@@ -35,7 +35,7 @@
     
     <!-- this template matches the paragraph element -->
     <xsl:template match="document/paragraph">
-        <xsl:param name="linewidth"/>
+        <xsl:param name="l_max"/>
         
         <xsl:copy>
             <!-- write the paragraph attributes -->
@@ -72,14 +72,14 @@
                     <xsl:with-param name="y_prev" select="0"/>
                     <xsl:with-param name="z_prev" select="0"/>
                     
-                    <!-- xsl:choose in order to support paragraphs with different linewidths... -->
-                    <xsl:with-param name="linewidth">
+                    <!-- xsl:choose in order to support paragraphs with different l_maxs... -->
+                    <xsl:with-param name="l_max">
                         <xsl:choose>
                             <xsl:when test="string-length(@line-width)">
-                                <xsl:value-of select="@linewidth"/>>
+                                <xsl:value-of select="@line-width"/>>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:value-of select="$linewidth"/>
+                                <xsl:value-of select="$l_max"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:with-param>
@@ -94,7 +94,7 @@
     <!-- This template will recursively iterate over the paragraphs and write out the possible branches -->
     <xsl:template name="create_branches">
         <xsl:param name="nodes"/>
-        <xsl:param name="linewidth"/>
+        <xsl:param name="l_max"/>
         <xsl:param name="start_index"/>
         <xsl:param name="stop_index"/>
         <xsl:param name="previous_break"/>
@@ -110,7 +110,7 @@
             <xsl:when test="not($start_index = 1) and not(name($nodes[position() = $start_index]) = 'box')">
                 <xsl:call-template name="create_branches">
                     <xsl:with-param name="nodes" select="$nodes"/>
-                    <xsl:with-param name="linewidth" select="$linewidth"/>
+                    <xsl:with-param name="l_max" select="$l_max"/>
                     <xsl:with-param name="start_index" select="$start_index + 1"/>
                     <xsl:with-param name="stop_index" select="$stop_index + 1"/>
                     <xsl:with-param name="previous_break" select="$previous_break"/>
@@ -194,13 +194,13 @@
                 <xsl:variable name="ratio">
                     <xsl:choose>
                         
-                        <!-- When l_prev equals the linewidth, the ratio is 0... -->
-                        <xsl:when test="$linewidth - $l_curr = 0">
+                        <!-- When l_prev equals the l_max, the ratio is 0... -->
+                        <xsl:when test="$l_max - $l_curr = 0">
                             <xsl:value-of select="0"/>
                         </xsl:when>
                         
-                        <!-- l_prev is smaller than the linewidth... -->
-                        <xsl:when test="$l_curr &lt; $linewidth">
+                        <!-- l_prev is smaller than the l_max... -->
+                        <xsl:when test="$l_curr &lt; $l_max">
                             <xsl:choose>
                                 
                                 <!-- If the stretchabilities are infinite, the ratio will be 0... -->
@@ -210,7 +210,7 @@
                                 
                                 <!-- If the stretchabilities are greater than 0 (and not infinite), calculate the ratio... -->
                                 <xsl:when test="$y_curr &gt; 0">
-                                    <xsl:value-of select="($linewidth - ($l_curr)) div $y_curr"/>
+                                    <xsl:value-of select="($l_max - ($l_curr)) div $y_curr"/>
                                 </xsl:when>
                                 
                                 <!-- In any other case, set the ratio to 'NaN' -->
@@ -221,9 +221,9 @@
                             </xsl:choose>
                         </xsl:when>
                         
-                        <!-- When l_prev is greater than the linewidth, the ratio will be negative.
+                        <!-- When l_prev is greater than the l_max, the ratio will be negative.
                             For simplicity reasons, this will not be calculated and a value of 'negative' is chosen instead. -->
-                        <xsl:when test="$l_curr &gt; $linewidth">
+                        <xsl:when test="$l_curr &gt; $l_max">
                             <xsl:value-of select="'negative'"/>
                         </xsl:when>
                         
@@ -325,7 +325,7 @@
                         <xsl:if test="not($new_break = -1)">
                             <xsl:call-template name="create_branches">
                                 <xsl:with-param name="nodes" select="$nodes"/>
-                                <xsl:with-param name="linewidth" select="$linewidth"/>
+                                <xsl:with-param name="l_max" select="$l_max"/>
                                 
                                 <!-- Restart 1 element after the break before the previous start... --> 
                                 <xsl:with-param name="start_index" select="$new_break + 1"/>
@@ -384,7 +384,7 @@
                     <xsl:otherwise>                            
                         <xsl:call-template name="create_branches">
                             <xsl:with-param name="nodes" select="$nodes"/>
-                            <xsl:with-param name="linewidth" select="$linewidth"/>
+                            <xsl:with-param name="l_max" select="$l_max"/>
                             
                             <!-- Since we are still looking at the same word, the start_index will remain the same -->
                             <xsl:with-param name="start_index" select="$start_index"/>
