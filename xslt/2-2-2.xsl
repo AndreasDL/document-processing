@@ -194,11 +194,11 @@
                 </xsl:call-template>
             </xsl:if>
             
-            <!-- recursion -->
+            <!-- recursion, ugly code-->
             <xsl:choose>
                 <!-- not at end of paragraph -->
-                <!-- not => fix for NaN etc -->
-                <xsl:when test="not(0 > $ratio) and $stop_element/@break != 'required'">
+                <!-- not => ugly fix for NaN etc -->
+                <xsl:when test="$stop_element/@break != 'required' and not(0 > $ratio)">
                     <xsl:call-template name="create_branches">
                         <xsl:with-param name="l_max" select="$l_max"/>
                         
@@ -272,7 +272,6 @@
 
                 <!-- else => no recursion !! -->                      
                 <xsl:otherwise/>
-
             </xsl:choose>
         
         </xsl:otherwise>

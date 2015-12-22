@@ -20,6 +20,7 @@
         <xsl:attribute name="height">
             <xsl:value-of select="$height"/>
         </xsl:attribute>
+
         <!-- hardcoded from example -->
         <xsl:attribute name="preserveAspectRatio">xMidYMid meet</xsl:attribute>
         <xsl:attribute name="zoomAndPan">magnify</xsl:attribute>
@@ -28,16 +29,16 @@
         <xsl:attribute name="contentStyleType">text/css</xsl:attribute>
 
         <!--rect-->
-        <rect style="fill:none;stroke-width:1;stroke:rgb(0,0,0);">
-            <xsl:attribute name="width">
-                <xsl:value-of select="/document/@line-width"/>
-            </xsl:attribute>
+        <rect style="fill:none;stroke-width:1;stroke:rgb(0,0,0);">            
             <xsl:attribute name="height">
                 <xsl:value-of select="$height"/>
             </xsl:attribute>
+            <xsl:attribute name="width">
+                <xsl:value-of select="/document/@line-width"/>
+            </xsl:attribute>
         </rect>
 
-        <!-- g -->
+        <!--start converting -->
         <xsl:call-template name="convertPara">
             <xsl:with-param name="index" select="1"/>
             <xsl:with-param name="y_para" select="0"/>
@@ -146,6 +147,7 @@
         </xsl:for-each>
     </g>
 
+    <!-- recursion -->
     <xsl:variable name="para_count" select="count(/document/paragraph[*])"/>
     <xsl:if test="$para_count > $index">
         <xsl:call-template name="convertPara">
@@ -186,29 +188,24 @@
         </tspan>
     </xsl:if>
 
-    <!-- update x -->
-    <xsl:variable name="x_new">
-        <xsl:choose>
-            <xsl:when test="$curr_element_type = 'glue'">
-                <xsl:value-of select="$x_curr + $curr_element_width + $curr_element/@stretchability * $ratio"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$x_curr + $curr_element_width"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
-
     <!-- recursion -->
-    <xsl:choose>
-        <xsl:when test="count(./*) > $index">
-            <xsl:call-template name="convertLine">
-                <xsl:with-param name="index" select="$index + 1"/>
-                <xsl:with-param name="y" select="$y"/>
-                <xsl:with-param name="x_curr" select="$x_new"/>
-            </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise/>
-    </xsl:choose>
+    <xsl:if test="count(./*) > $index">
+        <xsl:call-template name="convertLine">
+            <xsl:with-param name="index" select="$index + 1"/>
+            <xsl:with-param name="y" select="$y"/>
+            
+            <xsl:with-param name="x_curr">
+                <xsl:choose>
+                    <xsl:when test="$curr_element_type = 'glue'">
+                        <xsl:value-of select="$x_curr + $curr_element_width + $curr_element/@stretchability * $ratio"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$x_curr + $curr_element_width"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:with-param>
+        </xsl:call-template>
+    </xsl:if>
 
 </xsl:template>
 
