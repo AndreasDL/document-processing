@@ -36,7 +36,7 @@
                 <!-- Calculation starts at the beginning of the paragraph -->
                 <xsl:with-param name="start_index" select="1"/>
                 <xsl:with-param name="stop_index" select="1"/>
-                <xsl:with-param name="break_index" select="0"/>
+                <xsl:with-param name="curr_break" select="0"/>
                 
                 <!-- init sums at 0 -->
                 <xsl:with-param name="l_prev" select="0"/>
@@ -52,7 +52,8 @@
     <xsl:param name="l_max"/>
     <xsl:param name="start_index"/>
     <xsl:param name="stop_index"/>
-    <xsl:param name="break_index"/>
+    <xsl:param name="curr_break"/>
+    
     <xsl:param name="l_prev"/>
     <xsl:param name="y_prev"/>
     <xsl:param name="z_prev"/>
@@ -68,7 +69,7 @@
                 <xsl:with-param name="l_max" select="$l_max"/>
                 <xsl:with-param name="start_index" select="$start_index + 1"/>
                 <xsl:with-param name="stop_index" select="$stop_index + 1"/>
-                <xsl:with-param name="break_index" select="$break_index"/>
+                <xsl:with-param name="curr_break" select="$curr_break"/>
                 <xsl:with-param name="l_prev" select="0"/>
                 <xsl:with-param name="y_prev" select="0"/>
                 <xsl:with-param name="z_prev" select="0"/>
@@ -204,13 +205,13 @@
                         
                         <xsl:with-param name="start_index" select="$start_index"/>
                         <xsl:with-param name="stop_index" select="$stop_index + 1"/>
-                        <xsl:with-param name="break_index">
+                        <xsl:with-param name="curr_break">
                             <xsl:choose>
-                                <xsl:when test="$break_index = 0 and ($stop_element/@break = 'optional' or $stop_element/@break = 'required')"> 
+                                <xsl:when test="$curr_break = 0 and ($stop_element/@break = 'optional' or $stop_element/@break = 'required')"> 
                                     <xsl:value-of select="$stop_index"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="$break_index"/>
+                                    <xsl:value-of select="$curr_break"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:with-param>
@@ -223,22 +224,22 @@
                 </xsl:when>                            
 
                 <!-- required break => end of paragraph -->
-                <xsl:when test="$break_index != 0">
+                <xsl:when test="$curr_break != 0">
                     <xsl:call-template name="create_branches">
                         <xsl:with-param name="l_max" select="$l_max"/>
                         
                         <!-- continue one element after the break --> 
-                        <xsl:with-param name="start_index" select="$break_index + 1"/>
-                        <xsl:with-param name="stop_index" select="$break_index + 1"/>
+                        <xsl:with-param name="start_index" select="$curr_break + 1"/>
+                        <xsl:with-param name="stop_index" select="$curr_break + 1"/>
 
                         <!-- reset break index -->
-                        <xsl:with-param name="break_index" select="0"/>
+                        <xsl:with-param name="curr_break" select="0"/>
                         
                         <!-- last element might be part of new paragraph -->
                         <xsl:with-param name="l_prev">
                             <xsl:choose>
-                                <xsl:when test="name(./*[position() = $break_index]) != 'penalty'">
-                                    <xsl:value-of select="./*[position() = $break_index]/@width"/>
+                                <xsl:when test="name(./*[position() = $curr_break]) != 'penalty'">
+                                    <xsl:value-of select="./*[position() = $curr_break]/@width"/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:value-of select="0"/>
@@ -248,8 +249,8 @@
                         
                         <xsl:with-param name="y_prev">
                             <xsl:choose>
-                                <xsl:when test="name(/*[position() = $break_index]) = 'glue'">
-                                    <xsl:value-of select="./*[position() = $break_index]/@stretchability"/>
+                                <xsl:when test="name(/*[position() = $curr_break]) = 'glue'">
+                                    <xsl:value-of select="./*[position() = $curr_break]/@stretchability"/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:value-of select="0"/>
@@ -259,8 +260,8 @@
                         
                         <xsl:with-param name="z_prev">
                             <xsl:choose>
-                                <xsl:when test="name(./*[position() = $break_index]) = 'glue'">
-                                    <xsl:value-of select="./*[position() = $break_index]/@shrinkability"/>
+                                <xsl:when test="name(./*[position() = $curr_break]) = 'glue'">
+                                    <xsl:value-of select="./*[position() = $curr_break]/@shrinkability"/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:value-of select="0"/>
