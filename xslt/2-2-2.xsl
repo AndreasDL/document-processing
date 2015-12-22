@@ -62,7 +62,7 @@
 
     <xsl:choose>
         
-        <!-- Skip all whitespace in front of first box of a paragraph -->
+        <!-- skip all whitespace in front of first box of a paragraph -->
         <xsl:when test="$start_index != 1 and name(./*[position() = $start_index]) != 'box'">
             <xsl:call-template name="create_branches">
                 <xsl:with-param name="l_max" select="$l_max"/>
@@ -130,7 +130,6 @@
             <!-- Calculate the ratio -->
             <xsl:variable name="ratio">
                 <xsl:choose>
-                    
                     <!-- perfect fit -->
                     <xsl:when test="$l_max = $l_curr">
                         <xsl:value-of select="0"/>
