@@ -107,7 +107,7 @@
             
             <!-- We should start at the first box after the previous breakpoint (or on the first line),
                     therefore, we loop through the text and look for the next box... -->
-            <xsl:when test="not($start_index = 1) and not(name($nodes[position() = $start_index]) = 'box')">
+            <xsl:when test="$start_index != 1 and name($nodes[position() = $start_index]) != 'box'">
                 <xsl:call-template name="create_branches">
                     <xsl:with-param name="nodes" select="$nodes"/>
                     <xsl:with-param name="l_max" select="$l_max"/>
@@ -263,8 +263,8 @@
                             AND the ratio is not 'negative' or NaN... -->
                         <xsl:when test="($nodes[position() = $stop_index]/@break = 'required'
                             or $nodes[position() = $stop_index]/@break = 'optional')
-                            and not($ratio = 'NaN') and not($ratio = 'negative')
-                            and not($stop_index = $start_index)">
+                            and $ratio != 'NaN' and $ratio != 'negative'
+                            and $stop_index != $start_index">
                             <xsl:value-of select="1"/>
                         </xsl:when>
                         
@@ -383,7 +383,6 @@
                     <!-- If we are not yet at the end of the paragraph, continue the recursion... -->
                     <xsl:otherwise>                            
                         <xsl:call-template name="create_branches">
-                            <xsl:with-param name="nodes" select="$nodes"/>
                             <xsl:with-param name="l_max" select="$l_max"/>
                             
                             <!-- Since we are still looking at the same word, the start_index will remain the same -->
