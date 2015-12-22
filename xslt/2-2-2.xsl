@@ -199,8 +199,6 @@
             <!-- recursion -->
             <xsl:choose>
 
-
-
                 <!-- required break => end of paragraph -->
                 <xsl:when test="(0 > $ratio or $stop_element/@break = 'required')">
                     <xsl:if test="$break_index != 0">
