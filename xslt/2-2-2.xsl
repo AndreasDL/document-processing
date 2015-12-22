@@ -200,9 +200,10 @@
             
             <!-- recursion -->
             <xsl:choose>
+                <!-- required break => end of paragraph -->
                 <xsl:when test="0 > $ratio or $stop_element/@break = 'required'">
                     
-                    <!-- no break point before => beginning of paragraph -->
+                    <!-- break didn't happen yet -->
                     <xsl:if test="$break_index != 0">
                         <xsl:call-template name="create_branches">
                             <xsl:with-param name="l_max" select="$l_max"/>
@@ -214,12 +215,10 @@
                             <!-- reset break index -->
                             <xsl:with-param name="break_index" select="0"/>
                             
-                            <!-- The element at 'break_index' might be the first element of a new set of branches.
-                                Therefore, we initialize the l_prev value with the the current box or glue width if necessary. -->
+                            <!-- last element might be part of new paragraph -->
                             <xsl:with-param name="l_prev">
                                 <xsl:choose>
-                                    <xsl:when test="name(./*[position() = $break_index]) = 'box'
-                                        or name(./*[position() = $break_index]) = 'glue'">
+                                    <xsl:when test="name(./*[position() = $break_index]) != 'penalty'">
                                         <xsl:value-of select="./*[position() = $break_index]/@width"/>
                                     </xsl:when>
                                     <xsl:otherwise>
@@ -256,7 +255,9 @@
                             
                         </xsl:call-template>
                         </xsl:if>                                
-                    
+                        
+                        <!-- else => no recursion -->
+
                 </xsl:when>
                 
                 <!-- If we are not yet at the end of the paragraph, continue the recursion... -->
