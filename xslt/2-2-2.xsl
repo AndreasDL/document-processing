@@ -36,7 +36,9 @@
                 <!-- Calculation starts at the beginning of the paragraph -->
                 <xsl:with-param name="start_index" select="1"/>
                 <xsl:with-param name="stop_index" select="1"/>
+                
                 <xsl:with-param name="curr_break" select="0"/>
+                <xsl:with-param name="prev_break" select="0"/>
                 
                 <!-- init sums at 0 -->
                 <xsl:with-param name="l_prev" select="0"/>
@@ -50,14 +52,18 @@
 <!-- This is where the magic happens -->
 <xsl:template name="create_branches">
     <xsl:param name="l_max"/>
+    
     <xsl:param name="start_index"/>
     <xsl:param name="stop_index"/>
+
     <xsl:param name="curr_break"/>
-    
+    <xsl:param name="prev_break"/>
+
     <xsl:param name="l_prev"/>
     <xsl:param name="y_prev"/>
     <xsl:param name="z_prev"/>
     
+    <!-- readability++ -->
     <xsl:variable name="stop_element"  select="./*[position() = $stop_index]"/>
     <xsl:variable name="stop_element_type" select="name($stop_element)"/>
 
@@ -67,9 +73,13 @@
         <xsl:when test="$start_index != 1 and name(./*[position() = $start_index]) != 'box'">
             <xsl:call-template name="create_branches">
                 <xsl:with-param name="l_max" select="$l_max"/>
+                
                 <xsl:with-param name="start_index" select="$start_index + 1"/>
                 <xsl:with-param name="stop_index" select="$stop_index + 1"/>
+                
                 <xsl:with-param name="curr_break" select="$curr_break"/>
+                <xsl:with-param name="prev_break" select="$prev_break"/>
+                
                 <xsl:with-param name="l_prev" select="0"/>
                 <xsl:with-param name="y_prev" select="0"/>
                 <xsl:with-param name="z_prev" select="0"/>
@@ -192,6 +202,9 @@
                 <xsl:call-template name="writeBranch">
                     <xsl:with-param name="ratio" select="$ratio"/>
                     <xsl:with-param name="cost" select="$cost"/>
+                    <xsl:with-param name="prev_break" select="$prev_break"/>
+                    <xsl:with-param name="start_index" select="$start_index"/>
+                    <xsl:with-param name="stop_index" select="$stop_index"/>
                 </xsl:call-template>
             </xsl:if>
             
@@ -205,6 +218,8 @@
                         
                         <xsl:with-param name="start_index" select="$start_index"/>
                         <xsl:with-param name="stop_index" select="$stop_index + 1"/>
+
+                        <xsl:with-param name="prev_break" select="$prev_break"/>
                         <xsl:with-param name="curr_break">
                             <xsl:choose>
                                 <xsl:when test="$curr_break = 0 and ($stop_element/@break = 'optional' or $stop_element/@break = 'required')"> 
@@ -232,8 +247,9 @@
                         <xsl:with-param name="start_index" select="$curr_break + 1"/>
                         <xsl:with-param name="stop_index" select="$curr_break + 1"/>
 
-                        <!-- reset break index -->
+                        <xsl:with-param name="prev_break" select="$curr_break"/>
                         <xsl:with-param name="curr_break" select="0"/>
+
                         
                         <!-- last element might be part of new paragraph -->
                         <xsl:with-param name="l_prev">
@@ -283,12 +299,11 @@
 <xsl:template name="writeBranch">
     <xsl:param name="ratio"/>
     <xsl:param name="cost"/>
+    <xsl:param name="prev_break"/>
+    <xsl:param name="start_index"/>
+    <xsl:param name="stop_index"/>
 
     <branch>
-        <xsl:attribute name="ratio">
-            <xsl:value-of select="$ratio"/>
-        </xsl:attribute>
-
         <xsl:choose>
             <xsl:when test="$ratio = 0">
                 <xsl:attribute name="cost">
@@ -302,6 +317,23 @@
                 </xsl:attribute>
             </xsl:otherwise>
         </xsl:choose>
+
+        <xsl:attribute name="ratio">
+            <xsl:value-of select="$ratio"/>
+        </xsl:attribute>
+        
+        <xsl:attribute name="start">
+            <xsl:value-of select="$start_index"/>
+        </xsl:attribute>
+
+        <xsl:attribute name="stop">
+            <xsl:value-of select="$stop_index"/>
+        </xsl:attribute>
+
+        <xsl:attribute name="previous">
+            <xsl:value-of select="$prev_break"/>
+        </xsl:attribute>
+
     </branch>
 </xsl:template>
 </xsl:stylesheet>    
