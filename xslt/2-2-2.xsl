@@ -51,10 +51,6 @@
                
                <!-- Call the template to start calculating the branches -->
                 <xsl:call-template name="create_branches">
-                    
-                    <!-- The nodes contain all elements (glues, boxes and penalties) of the paragraph -->
-                    <xsl:with-param name="nodes" select="*"/>
-                    
                     <!-- Calculation starts at the beginning of the paragraph -->
                     <xsl:with-param name="start_index" select="1"/>
                     <xsl:with-param name="stop_index" select="1"/>
@@ -93,7 +89,6 @@
     
     <!-- This template will recursively iterate over the paragraphs and write out the possible branches -->
     <xsl:template name="create_branches">
-        <xsl:param name="nodes"/>
         <xsl:param name="l_max"/>
         <xsl:param name="start_index"/>
         <xsl:param name="stop_index"/>
@@ -107,9 +102,8 @@
             
             <!-- We should start at the first box after the previous breakpoint (or on the first line),
                     therefore, we loop through the text and look for the next box... -->
-            <xsl:when test="$start_index != 1 and name($nodes[position() = $start_index]) != 'box'">
+            <xsl:when test="$start_index != 1 and name(./*[position() = $start_index]) != 'box'">
                 <xsl:call-template name="create_branches">
-                    <xsl:with-param name="nodes" select="$nodes"/>
                     <xsl:with-param name="l_max" select="$l_max"/>
                     <xsl:with-param name="start_index" select="$start_index + 1"/>
                     <xsl:with-param name="stop_index" select="$stop_index + 1"/>
@@ -129,9 +123,9 @@
                     <xsl:choose>
                         
                         <!-- If the current element (at start_index $stop_index) is a glue, add the width of this element -->
-                        <xsl:when test="name($nodes[position() = $stop_index]) = 'glue'
-                            or name($nodes[position() = $stop_index]) = 'box'">
-                            <xsl:value-of select="$l_prev + $nodes[position() = $stop_index]/@width"/>
+                        <xsl:when test="name(./*[position() = $stop_index]) = 'glue'
+                            or name(./*[position() = $stop_index]) = 'box'">
+                            <xsl:value-of select="$l_prev + ./*[position() = $stop_index]/@width"/>
                         </xsl:when>
                         
                         <!-- If the current element (at start_index $stop_index) is neither a glue or a box, the value will stay the same -->
@@ -146,22 +140,22 @@
                     <xsl:choose>
                         
                         <!-- If the current element (at start_index $stop_index) is a glue, add the stretchability -->
-                        <xsl:when test="name($nodes[position() = $stop_index]) = 'glue'">
+                        <xsl:when test="name(./*[position() = $stop_index]) = 'glue'">
                             <xsl:choose>
                                 
                                 <!-- When adding INF, the value is hard coded to 'INF' -->
-                                <xsl:when test="$nodes[position() = $stop_index]/@stretchability = 'INF'">
+                                <xsl:when test="./*[position() = $stop_index]/@stretchability = 'INF'">
                                     <xsl:value-of select="'INF'"/>
                                 </xsl:when>
                                 
                                 <!-- When adding -INF, the value is hard coded to '-INF' -->
-                                <xsl:when test="$nodes[position() = $stop_index]/@stretchability = '-INF'">
+                                <xsl:when test="./*[position() = $stop_index]/@stretchability = '-INF'">
                                     <xsl:value-of select="'-INF'"/>
                                 </xsl:when>
                                 
                                 <!-- Otherwise, if the glue has a numerical stretchability, calculate the sum... -->
                                 <xsl:otherwise>
-                                    <xsl:value-of select="$y_prev + $nodes[position() = $stop_index]/@stretchability"/>
+                                    <xsl:value-of select="$y_prev + ./*[position() = $stop_index]/@stretchability"/>
                                 </xsl:otherwise>
                                 
                             </xsl:choose>
@@ -179,8 +173,8 @@
                     <xsl:choose>
                         
                         <!-- If the current element (at start_index $stop_index) is a glue, add the shrinkability -->
-                        <xsl:when test="name($nodes[position() = $stop_index]) = 'glue'">
-                            <xsl:value-of select="$z_prev + $nodes[position() = $stop_index]/@shrinkability"/>
+                        <xsl:when test="name(./*[position() = $stop_index]) = 'glue'">
+                            <xsl:value-of select="$z_prev + ./*[position() = $stop_index]/@shrinkability"/>
                         </xsl:when>
                         
                         <!-- If the current element (at start_index $stop_index) is not a glue, the value will stay the same -->
@@ -235,7 +229,7 @@
                     <xsl:choose>
                         
                         <!-- When the ratio is 0 or the penalty -INF, set the cost to -INF -->
-                        <xsl:when test="$ratio = 0 or $nodes[position() = $stop_index]/@penalty = '-INF'">
+                        <xsl:when test="$ratio = 0 or ./*[position() = $stop_index]/@penalty = '-INF'">
                             <!--<xsl:value-of select="'-INF'"/>-->
                             <!-- A cost of -INF will cause that a random branch is chosen at the end of the paragraph
                                 (for example, 5 - INF is the same as 1 - INF). Therefore a value of 0 is chosen instead of -INF. -->
@@ -261,8 +255,8 @@
                         
                         <!-- We will only write a branch if we are at an optional or required break
                             AND the ratio is not 'negative' or NaN... -->
-                        <xsl:when test="($nodes[position() = $stop_index]/@break = 'required'
-                            or $nodes[position() = $stop_index]/@break = 'optional')
+                        <xsl:when test="(./*[position() = $stop_index]/@break = 'required'
+                            or ./*[position() = $stop_index]/@break = 'optional')
                             and $ratio != 'NaN' and $ratio != 'negative'
                             and $stop_index != $start_index">
                             <xsl:value-of select="1"/>
@@ -319,12 +313,11 @@
                 <xsl:choose>
                 
                     <!-- Continue with the recursion if we're not at the end of the paragraph... -->
-                    <xsl:when test="0 > $ratio or $ratio = 'negative' or $nodes[position() = $stop_index]/@break = 'required'">
+                    <xsl:when test="0 > $ratio or $ratio = 'negative' or ./*[position() = $stop_index]/@break = 'required'">
                         
                         <!-- If no new next breakpoint was enstop_indexed, we are at the end of the paragraph ==> Stop -->
                         <xsl:if test="not($new_break = -1)">
                             <xsl:call-template name="create_branches">
-                                <xsl:with-param name="nodes" select="$nodes"/>
                                 <xsl:with-param name="l_max" select="$l_max"/>
                                 
                                 <!-- Restart 1 element after the break before the previous start... --> 
@@ -339,9 +332,9 @@
                                     Therefore, we initialize the l_prev value with the the current box or glue width if necessary. -->
                                 <xsl:with-param name="l_prev">
                                     <xsl:choose>
-                                        <xsl:when test="name($nodes[position() = $new_break]) = 'box'
-                                            or name($nodes[position() = $new_break]) = 'glue'">
-                                            <xsl:value-of select="$nodes[position() = $new_break]/@width"/>
+                                        <xsl:when test="name(./*[position() = $new_break]) = 'box'
+                                            or name(./*[position() = $new_break]) = 'glue'">
+                                            <xsl:value-of select="./*[position() = $new_break]/@width"/>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:value-of select="0"/>
@@ -353,8 +346,8 @@
                                     Therefore, we initialize the y_prev value with the the current glue stretchability if necessary. -->
                                 <xsl:with-param name="y_prev">
                                     <xsl:choose>
-                                        <xsl:when test="name($nodes[position() = $new_break]) = 'glue'">
-                                            <xsl:value-of select="$nodes[position() = $new_break]/@stretchability"/>
+                                        <xsl:when test="name(/*[position() = $new_break]) = 'glue'">
+                                            <xsl:value-of select="./*[position() = $new_break]/@stretchability"/>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:value-of select="0"/>
@@ -366,8 +359,8 @@
                                     Therefore, we initialize the z_prev value with the the current glue shrinkability if necessary. -->
                                 <xsl:with-param name="z_prev">
                                     <xsl:choose>
-                                        <xsl:when test="name($nodes[position() = $new_break]) = 'glue'">
-                                            <xsl:value-of select="$nodes[position() = $new_break]/@shrinkability"/>
+                                        <xsl:when test="name(./*[position() = $new_break]) = 'glue'">
+                                            <xsl:value-of select="./*[position() = $new_break]/@shrinkability"/>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:value-of select="0"/>
@@ -408,8 +401,8 @@
                                         <xsl:choose>
                                             
                                             <!-- If the current element has an optional or required break, this is the new_break start_index -->
-                                            <xsl:when test="($nodes[position() = $stop_index]/@break = 'optional'
-                                                or $nodes[position() = $stop_index]/@break = 'required')"> 
+                                            <xsl:when test="(./*[position() = $stop_index]/@break = 'optional'
+                                                or ./*[position() = $stop_index]/@break = 'required')"> 
                                                 <!--and $stop_index &gt; $start_index">-->
                                                 <xsl:value-of select="$stop_index"/>
                                             </xsl:when>
