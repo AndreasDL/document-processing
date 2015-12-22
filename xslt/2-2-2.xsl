@@ -20,7 +20,7 @@
         <content>
             <xsl:copy-of select="current()/*"/>
         </content>
-        
+
         <!-- place branches tags and calculate branches cost and ratio -->
         <branches>
            
@@ -29,10 +29,7 @@
                 <!-- Calculation starts at the beginning of the paragraph -->
                 <xsl:with-param name="start_index" select="1"/>
                 <xsl:with-param name="stop_index" select="1"/>
-                
-                <!-- Since there are no previous breaks, this is set to 0 -->
-                <xsl:with-param name="previous_break" select="0"/>
-                
+                                
                 <!-- new_break will store the first possible breakpoint enstop_indexed when calculating
                     branches. The next iteration will start at this start_index. It is set at -1 until the
                     next breakpoint is found. -->
@@ -66,7 +63,6 @@
     <xsl:param name="l_max"/>
     <xsl:param name="start_index"/>
     <xsl:param name="stop_index"/>
-    <xsl:param name="previous_break"/>
     <xsl:param name="new_break"/>
     <xsl:param name="l_prev"/>
     <xsl:param name="y_prev"/>
@@ -84,7 +80,6 @@
                 <xsl:with-param name="l_max" select="$l_max"/>
                 <xsl:with-param name="start_index" select="$start_index + 1"/>
                 <xsl:with-param name="stop_index" select="$stop_index + 1"/>
-                <xsl:with-param name="previous_break" select="$previous_break"/>
                 <xsl:with-param name="new_break" select="$new_break"/>
                 <xsl:with-param name="l_prev" select="0"/>
                 <xsl:with-param name="y_prev" select="0"/>
@@ -245,8 +240,6 @@
                             <xsl:with-param name="start_index" select="$new_break + 1"/>
                             <xsl:with-param name="stop_index" select="$new_break + 1"/>
                             
-                            <!-- The new 'previous' start_index in the branches will be the 'new_break' start_index -->
-                            <xsl:with-param name="previous_break" select="$new_break"/>
                             <xsl:with-param name="new_break" select="-1"/>
                             
                             <!-- The element at 'new_break' might be the first element of a new set of branches.
@@ -302,7 +295,6 @@
                         <xsl:with-param name="start_index" select="$start_index"/>
                         <xsl:with-param name="stop_index" select="$stop_index + 1"/>
                         
-                        <xsl:with-param name="previous_break" select="$previous_break"/>
                         <xsl:with-param name="new_break">
                             <xsl:choose>
                                 <xsl:when test="$new_break = -1 and ($stop_element/@break = 'optional'
