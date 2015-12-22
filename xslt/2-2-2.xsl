@@ -20,7 +20,6 @@
 
         <!-- here is where it starts to get interesting -->
         <branches>
-            <!-- Call the template to start calculating the branches -->
             <xsl:call-template name="create_branches">
                 <!-- correct line width -->
                 <xsl:with-param name="l_max">
@@ -47,8 +46,8 @@
         </branches>         
     </xsl:copy>
 </xsl:template>
-    
-<!-- This template will recursively iterate over the paragraphs and write out the possible branches -->
+
+<!-- This is where the magic happens -->
 <xsl:template name="create_branches">
     <xsl:param name="l_max"/>
     <xsl:param name="start_index"/>
@@ -78,7 +77,7 @@
         
         <xsl:otherwise>
 
-            <!-- Calculate the new l_prev value -->
+            <!-- calculate l_curr -->
             <xsl:variable name="l_curr">
                 <xsl:choose>
                     <!-- penalty ==> nothing changes -->
@@ -92,7 +91,7 @@
                 </xsl:choose>
             </xsl:variable>
             
-            <!-- Calculate the new y_prev value -->
+            <!-- calculate y_curr -->
             <xsl:variable name="y_curr">
                 <xsl:choose>
                     <xsl:when test="$stop_element_type = 'glue'">
@@ -115,7 +114,7 @@
                 </xsl:choose>
             </xsl:variable>
             
-            <!-- Calculate the new z_prev value -->
+            <!-- calculate z_curr -->
             <xsl:variable name="z_curr">
                 <xsl:choose>
                     <xsl:when test="$stop_element_type = 'glue'">
@@ -198,9 +197,9 @@
             
             <!-- recursion -->
             <xsl:choose>
-
                 <!-- required break => end of paragraph -->
                 <xsl:when test="(0 > $ratio or $stop_element/@break = 'required')">
+                    <!-- break needs to happen -->
                     <xsl:if test="$break_index != 0">
                         <xsl:call-template name="create_branches">
                             <xsl:with-param name="l_max" select="$l_max"/>
@@ -247,10 +246,11 @@
                             </xsl:with-param>
                         </xsl:call-template>   
                     </xsl:if>
-                    <!-- else => no recursion -->
+
+                    <!-- else => no recursion !! -->
                 </xsl:when>                            
 
-                <!-- If we are not yet at the end of the paragraph, continue the recursion... -->
+                <!-- not at end of paragraph -->
                 <xsl:otherwise>                        
                     <xsl:call-template name="create_branches">
                         <xsl:with-param name="l_max" select="$l_max"/>
@@ -268,7 +268,7 @@
                             </xsl:choose>
                         </xsl:with-param>
                  
-                        <!-- Pass the new l_prev, y_prev and z_prev values -->
+                        <!-- update l,y,z values -->
                         <xsl:with-param name="l_prev" select="$l_curr"/>
                         <xsl:with-param name="y_prev" select="$y_curr"/>
                         <xsl:with-param name="z_prev" select="$z_curr"/>
@@ -281,6 +281,7 @@
     </xsl:choose>
 </xsl:template>
 
+<!-- write branch to output -->
 <xsl:template name="writeBranch">
     <xsl:param name="ratio"/>
     <xsl:param name="cost"/>
