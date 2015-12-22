@@ -188,8 +188,8 @@
                 </xsl:choose>           
             </xsl:variable>
             
-            <xsl:if test="$stop_element/@break != 'prohibited'
-                        and $stop_index != $start_index and $ratio != 'NaN' and $ratio > 0 ">
+            <!-- write branch when needed -->
+            <xsl:if test="$stop_element/@break != 'prohibited' and $stop_index != $start_index and $ratio != 'NaN' and $ratio > 0 ">
                 <xsl:call-template name="writeBranch">
                     <xsl:with-param name="ratio" select="$ratio"/>
                     <xsl:with-param name="cost" select="$cost"/>
@@ -198,10 +198,11 @@
             
             <!-- recursion -->
             <xsl:choose>
+
+
+
                 <!-- required break => end of paragraph -->
-                <xsl:when test="0 > $ratio or $stop_element/@break = 'required'">
-                    
-                    <!-- break didn't happen yet -->
+                <xsl:when test="(0 > $ratio or $stop_element/@break = 'required')">
                     <xsl:if test="$break_index != 0">
                         <xsl:call-template name="create_branches">
                             <xsl:with-param name="l_max" select="$l_max"/>
@@ -246,16 +247,13 @@
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:with-param>
-                            
-                        </xsl:call-template>
-                        </xsl:if>                                
-                        
-                        <!-- else => no recursion -->
+                        </xsl:call-template>   
+                    </xsl:if>
+                    <!-- else => no recursion -->
+                </xsl:when>                            
 
-                </xsl:when>
-                
                 <!-- If we are not yet at the end of the paragraph, continue the recursion... -->
-                <xsl:otherwise>                            
+                <xsl:otherwise>                        
                     <xsl:call-template name="create_branches">
                         <xsl:with-param name="l_max" select="$l_max"/>
                         
@@ -278,6 +276,7 @@
                         <xsl:with-param name="z_prev" select="$z_curr"/>
                     </xsl:call-template>
                 </xsl:otherwise>
+
             </xsl:choose>
         
         </xsl:otherwise>
