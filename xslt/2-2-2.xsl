@@ -205,8 +205,7 @@
                 </xsl:choose>           
             </xsl:variable>
             
-            <xsl:if test="($stop_element/@break = 'required'
-                        or $stop_element/@break = 'optional')
+            <xsl:if test="$stop_element/@break != 'prohibited'
                         and $ratio != 'NaN' and $ratio > 0
                         and $stop_index != $start_index">
                 <xsl:call-template name="writeBranch">
@@ -284,7 +283,6 @@
                         
                         <xsl:with-param name="start_index" select="$start_index"/>
                         <xsl:with-param name="stop_index" select="$stop_index + 1"/>
-                        
                         <xsl:with-param name="break_index">
                             <xsl:choose>
                                 <xsl:when test="$break_index = 0 and ($stop_element/@break = 'optional' or $stop_element/@break = 'required')"> 
