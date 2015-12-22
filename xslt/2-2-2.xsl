@@ -197,7 +197,8 @@
             <!-- recursion -->
             <xsl:choose>
                 <!-- not at end of paragraph -->
-                <xsl:when test="not(0 > $ratio or $stop_element/@break = 'required')">
+                <!-- not => fix for NaN etc -->
+                <xsl:when test="not(0 > $ratio) and $stop_element/@break != 'required'">
                     <xsl:call-template name="create_branches">
                         <xsl:with-param name="l_max" select="$l_max"/>
                         
@@ -223,50 +224,50 @@
 
                 <!-- required break => end of paragraph -->
                 <xsl:when test="$break_index != 0">
-                        <xsl:call-template name="create_branches">
-                            <xsl:with-param name="l_max" select="$l_max"/>
-                            
-                            <!-- continue one element after the break --> 
-                            <xsl:with-param name="start_index" select="$break_index + 1"/>
-                            <xsl:with-param name="stop_index" select="$break_index + 1"/>
+                    <xsl:call-template name="create_branches">
+                        <xsl:with-param name="l_max" select="$l_max"/>
+                        
+                        <!-- continue one element after the break --> 
+                        <xsl:with-param name="start_index" select="$break_index + 1"/>
+                        <xsl:with-param name="stop_index" select="$break_index + 1"/>
 
-                            <!-- reset break index -->
-                            <xsl:with-param name="break_index" select="0"/>
-                            
-                            <!-- last element might be part of new paragraph -->
-                            <xsl:with-param name="l_prev">
-                                <xsl:choose>
-                                    <xsl:when test="name(./*[position() = $break_index]) != 'penalty'">
-                                        <xsl:value-of select="./*[position() = $break_index]/@width"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="0"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:with-param>
-                            
-                            <xsl:with-param name="y_prev">
-                                <xsl:choose>
-                                    <xsl:when test="name(/*[position() = $break_index]) = 'glue'">
-                                        <xsl:value-of select="./*[position() = $break_index]/@stretchability"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="0"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:with-param>
-                            
-                            <xsl:with-param name="z_prev">
-                                <xsl:choose>
-                                    <xsl:when test="name(./*[position() = $break_index]) = 'glue'">
-                                        <xsl:value-of select="./*[position() = $break_index]/@shrinkability"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="0"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:with-param>
-                        </xsl:call-template>   
+                        <!-- reset break index -->
+                        <xsl:with-param name="break_index" select="0"/>
+                        
+                        <!-- last element might be part of new paragraph -->
+                        <xsl:with-param name="l_prev">
+                            <xsl:choose>
+                                <xsl:when test="name(./*[position() = $break_index]) != 'penalty'">
+                                    <xsl:value-of select="./*[position() = $break_index]/@width"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="0"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:with-param>
+                        
+                        <xsl:with-param name="y_prev">
+                            <xsl:choose>
+                                <xsl:when test="name(/*[position() = $break_index]) = 'glue'">
+                                    <xsl:value-of select="./*[position() = $break_index]/@stretchability"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="0"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:with-param>
+                        
+                        <xsl:with-param name="z_prev">
+                            <xsl:choose>
+                                <xsl:when test="name(./*[position() = $break_index]) = 'glue'">
+                                    <xsl:value-of select="./*[position() = $break_index]/@shrinkability"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="0"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:with-param>
+                    </xsl:call-template>   
                 </xsl:when>
 
                 <!-- else => no recursion !! -->                      
