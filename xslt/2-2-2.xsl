@@ -114,21 +114,17 @@
             <xsl:variable name="y_curr">
                 <xsl:choose>
                     
-                    <!-- If the current element (at start_index $stop_index) is a glue, add the stretchability -->
+                    <!-- infinity is not supported -->
                     <xsl:when test="$stop_element_type = 'glue'">
                         <xsl:choose>
-                            
-                            <!-- When adding INF, the value is hard coded to 'INF' -->
                             <xsl:when test="$stop_element/@stretchability = 'INF'">
                                 <xsl:value-of select="'INF'"/>
                             </xsl:when>
-                            
-                            <!-- When adding -INF, the value is hard coded to '-INF' -->
+
                             <xsl:when test="$stop_element/@stretchability = '-INF'">
                                 <xsl:value-of select="'-INF'"/>
                             </xsl:when>
                             
-                            <!-- Otherwise, if the glue has a numerical stretchability, calculate the sum... -->
                             <xsl:otherwise>
                                 <xsl:value-of select="$y_prev + $stop_element/@stretchability"/>
                             </xsl:otherwise>
@@ -136,7 +132,7 @@
                         </xsl:choose>
                     </xsl:when>
                     
-                    <!-- If the current element (at start_index $stop_index) is not a glue, the value will stay the same -->
+                    <!-- no glue, no changes -->
                     <xsl:otherwise>
                         <xsl:value-of select="$y_prev"/>
                     </xsl:otherwise>
@@ -146,13 +142,10 @@
             <!-- Calculate the new z_prev value -->
             <xsl:variable name="z_curr">
                 <xsl:choose>
-                    
-                    <!-- If the current element (at start_index $stop_index) is a glue, add the shrinkability -->
                     <xsl:when test="$stop_element_type = 'glue'">
                         <xsl:value-of select="$z_prev + $stop_element/@shrinkability"/>
                     </xsl:when>
                     
-                    <!-- If the current element (at start_index $stop_index) is not a glue, the value will stay the same -->
                     <xsl:otherwise>
                         <xsl:value-of select="$z_prev"/>
                     </xsl:otherwise>
@@ -178,7 +171,7 @@
                             </xsl:when>
                             
                             <!-- If the stretchabilities are greater than 0 (and not infinite), calculate the ratio... -->
-                            <xsl:when test="$y_curr &gt; 0">
+                            <xsl:when test="$y_curr > 0">
                                 <xsl:value-of select="($l_max - ($l_curr)) div $y_curr"/>
                             </xsl:when>
                             
@@ -212,7 +205,7 @@
                     </xsl:when>
                     
                     <!-- Set the cost to INF when the ratio is (-)INF, < -1 or 'NaN'... --> 
-                    <xsl:when test="$ratio = 'NaN' or $ratio = 'INF' or $ratio = '-INF' or $ratio &lt; -1">
+                    <xsl:when test="$ratio = 'NaN' or $ratio = 'INF' or $ratio = '-INF' or -1 > $ratio">
                         <xsl:value-of select="'INF'"/>
                     </xsl:when>
                     
