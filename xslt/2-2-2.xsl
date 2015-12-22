@@ -2,45 +2,27 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="xml" encoding="UTF-8" omit-xml-declaration="no" indent="yes"/>    
 
-<!-- Copy all other elements -->
+<!-- Copy all other elements (document)-->
 <xsl:template match="@*|node()">
     <xsl:copy>
         <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
 </xsl:template>
 
-<!-- this template matches the paragraph element -->
 <xsl:template match="paragraph">
-
-
     <xsl:copy>
         <xsl:apply-templates select="@*"/>
         
-        <!-- copy the content of step 1 between the content tags -->
+        <!-- put content in place -->
         <content>
             <xsl:copy-of select="current()/*"/>
         </content>
 
-        <!-- place branches tags and calculate branches cost and ratio -->
+        <!-- here is where it starts to get interesting -->
         <branches>
-           
-           <!-- Call the template to start calculating the branches -->
+            <!-- Call the template to start calculating the branches -->
             <xsl:call-template name="create_branches">
-                <!-- Calculation starts at the beginning of the paragraph -->
-                <xsl:with-param name="start_index" select="1"/>
-                <xsl:with-param name="stop_index" select="1"/>
-                                
-                <!-- break_index will store the first possible breakpoint enstop_indexed when calculating
-                    branches. The next iteration will start at this start_index. It is set at -1 until the
-                    next breakpoint is found. -->
-                <xsl:with-param name="break_index" select="0"/>
-                
-                <!-- The l_prev, y_prev and z_prev values are initialized at 0... -->
-                <xsl:with-param name="l_prev" select="0"/>
-                <xsl:with-param name="y_prev" select="0"/>
-                <xsl:with-param name="z_prev" select="0"/>
-                
-                <!-- xsl:choose in order to support paragraphs with different l_maxs... -->
+                <!-- correct line width -->
                 <xsl:with-param name="l_max">
                     <xsl:choose>
                         <xsl:when test="string-length(@line-width)">
@@ -51,10 +33,18 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:with-param>
+
+                <!-- Calculation starts at the beginning of the paragraph -->
+                <xsl:with-param name="start_index" select="1"/>
+                <xsl:with-param name="stop_index" select="1"/>
+                <xsl:with-param name="break_index" select="0"/>
                 
+                <!-- init sums at 0 -->
+                <xsl:with-param name="l_prev" select="0"/>
+                <xsl:with-param name="y_prev" select="0"/>
+                <xsl:with-param name="z_prev" select="0"/>
             </xsl:call-template>
         </branches>         
-        
     </xsl:copy>
 </xsl:template>
     
@@ -73,8 +63,7 @@
 
     <xsl:choose>
         
-        <!-- We should start at the first box after the previous breakpoint (or on the first line),
-                therefore, we loop through the text and look for the next box... -->
+        <!-- Skip all whitespace in front of first box of a paragraph -->
         <xsl:when test="$start_index != 1 and name(./*[position() = $start_index]) != 'box'">
             <xsl:call-template name="create_branches">
                 <xsl:with-param name="l_max" select="$l_max"/>
@@ -143,40 +132,36 @@
             <xsl:variable name="ratio">
                 <xsl:choose>
                     
-                    <!-- When l_prev equals the l_max, the ratio is 0... -->
+                    <!-- perfect fit -->
                     <xsl:when test="$l_max = $l_curr">
                         <xsl:value-of select="0"/>
                     </xsl:when>
                     
-                    <!-- l_prev is smaller than the l_max... -->
-                    <xsl:when test="$l_max > $l_curr">
+                    <!-- shrink -->
+                    <xsl:when test="$l_curr > $l_max">
+                        <xsl:value-of select="($l_max - ($l_curr)) div $z_curr"/>
+                    </xsl:when>
+
+                    <!-- stretch ($l_curr < $l_max) -->
+                    <xsl:otherwise>
                         <xsl:choose>
-                            
-                            <!-- If the stretchabilities are infinite, the ratio will be 0... -->
+                            <!-- stretch = inf => ratio = 0 -->
                             <xsl:when test="number($y_curr) = 'NaN'">
                                 <xsl:value-of select="0"/>
                             </xsl:when>
                             
-                            <!-- If the stretchabilities are greater than 0 (and not infinite), calculate the ratio... -->
+                            <!-- normal case -->
                             <xsl:when test="$y_curr > 0">
                                 <xsl:value-of select="($l_max - ($l_curr)) div $y_curr"/>
                             </xsl:when>
                             
-                            <!-- In any other case, set the ratio to 'NaN' -->
+                            <!-- < 0 => undef -->
                             <xsl:otherwise>
                                 <xsl:value-of select="'NaN'"/>
                             </xsl:otherwise>
                             
                         </xsl:choose>
-                    </xsl:when>
-                    
-                    <!-- When l_prev is greater than the l_max, the ratio will be negative.
-                        For simplicity reasons, this will not be calculated and a value of 'negative' is chosen instead. -->
-                    <xsl:when test="$l_curr > $l_max">
-                        <!--<xsl:value-of select="negative"/-->
-                        <xsl:value-of select="($l_max - ($l_curr)) div $z_curr"/>
-                    </xsl:when>
-                    
+                    </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
 
@@ -215,6 +200,8 @@
             </xsl:if>
             
             <!-- recursion -->
+            <!-- variables to pass -->
+
             <xsl:choose>
             
                 <!-- Continue with the recursion if we're not at the end of the paragraph... -->
