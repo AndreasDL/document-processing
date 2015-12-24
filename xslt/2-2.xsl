@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-<xsl:output method="xml" encoding="UTF-8" omit-xml-declaration="no" indent="yes"/>    
+<xsl:output method="xml" encoding="UTF-8" omit-xml-declaration="no" indent="no"/>    
 
 <!-- Copy all other elements (document)-->
 <xsl:template match="@*|node()">
@@ -9,45 +9,6 @@
     </xsl:copy>
 </xsl:template>
 
-<xsl:template match="paragraph">
-    <xsl:copy>
-        <xsl:apply-templates select="@*"/>
-        
-        <!-- put content in place -->
-        <content>
-            <xsl:copy-of select="current()/*"/>
-        </content>
-
-        <!-- here is where it starts to get interesting -->
-        <branches>
-            <xsl:call-template name="create_branches">
-                <!-- correct line width -->
-                <xsl:with-param name="l_max">
-                    <xsl:choose>
-                        <xsl:when test="string-length(@line-width)">
-                            <xsl:value-of select="@line-width"/>>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="/document/@line-width"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:with-param>
-
-                <!-- Calculation starts at the beginning of the paragraph -->
-                <xsl:with-param name="start_index" select="1"/>
-                <xsl:with-param name="stop_index" select="1"/>
-                
-                <xsl:with-param name="curr_break" select="0"/>
-                <xsl:with-param name="prev_break" select="0"/>
-                
-                <!-- init sums at 0 -->
-                <xsl:with-param name="l_prev" select="0"/>
-                <xsl:with-param name="y_prev" select="0"/>
-                <xsl:with-param name="z_prev" select="0"/>
-            </xsl:call-template>
-        </branches>         
-    </xsl:copy>
-</xsl:template>
 
 <!-- This is where the magic happens -->
 <xsl:template name="create_branches">
@@ -291,6 +252,46 @@
         
         </xsl:otherwise>
     </xsl:choose>
+</xsl:template>
+
+<xsl:template match="paragraph">
+    <xsl:copy>
+        <xsl:apply-templates select="@*"/>
+        
+        <!-- put content in place -->
+        <content>
+            <xsl:copy-of select="current()/*"/>
+        </content>
+
+        <!-- here is where it starts to get interesting -->
+        <branches>
+            <xsl:call-template name="create_branches">
+                <!-- correct line width -->
+                <xsl:with-param name="l_max">
+                    <xsl:choose>
+                        <xsl:when test="string-length(@line-width)">
+                            <xsl:value-of select="@line-width"/>>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="/document/@line-width"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:with-param>
+
+                <!-- Calculation starts at the beginning of the paragraph -->
+                <xsl:with-param name="start_index" select="1"/>
+                <xsl:with-param name="stop_index" select="1"/>
+                
+                <xsl:with-param name="curr_break" select="0"/>
+                <xsl:with-param name="prev_break" select="0"/>
+                
+                <!-- init sums at 0 -->
+                <xsl:with-param name="l_prev" select="0"/>
+                <xsl:with-param name="y_prev" select="0"/>
+                <xsl:with-param name="z_prev" select="0"/>
+            </xsl:call-template>
+        </branches>         
+    </xsl:copy>
 </xsl:template>
 
 <!-- write branch to output -->

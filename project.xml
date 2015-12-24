@@ -11,11 +11,12 @@
             <transformation>2-1.xsl</transformation>
             <transformation>2-2.xsl</transformation>
         </step>
-        <step fallback="true">
+        <step fallback="false">
             <transformation>3-1.xsl</transformation>
         </step>
-        <step fallback="false"><!-- fallback has no use here :D -->
+        <step/>
+        <!-- fallback="false">
             <transformation>4-1.xsl</transformation>
-        </step>
+        </step-->
     </solution>
 </project>
