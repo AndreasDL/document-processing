@@ -14,9 +14,8 @@
         <step fallback="false">
             <transformation>3-1.xsl</transformation>
         </step>
-        <step/>
-        <!-- fallback="false">
+        <step fallback="false">
             <transformation>4-1.xsl</transformation>
-        </step-->
+        </step>
     </solution>
 </project>
