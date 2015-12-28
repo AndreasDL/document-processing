@@ -6,26 +6,37 @@
 
 <!-- init template -->
 <xsl:template match="branches">
-    <xsl:variable name="target_index" select="./branch[last()]/@stop"/>
+    <xsl:variable name="index_count" select="count(./*)"/> <!--./branch[last()]/@stop"/-->
     <xsl:variable name="list_of_paths">_1;0;undef_</xsl:variable><!-- list => _to;cost;prev_ -->
 
 
-    <xsl:call-template name="get_existing_cost">
+    <!--xsl:call-template name="get_existing_cost">
         <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
         <xsl:with-param name="to" select="1"/>
-    </xsl:call-template>
+    </xsl:call-template-->
 
-    <xsl:call-template name="get_existing_line">
+    <!--xsl:call-template name="get_existing_cost">
+        <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
+        <xsl:with-param name="to" select="2"/>
+    </xsl:call-template-->
+
+    <!--xsl:call-template name="get_existing_line">
         <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
         <xsl:with-param name="to" select="1"/>
-    </xsl:call-template>
+    </xsl:call-template-->
+    
+    <!--xsl:call-template name="get_existing_line">
+        <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
+        <xsl:with-param name="to" select="2"/>
+    </xsl:call-template-->
+
 
     <!-- find shortest path -->
     <xsl:variable name="shortest_paths">
         <xsl:call-template name="find_shortest_paths">
             <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
-            <xsl:with-param name="target_index" select="$target_index"/>
-            <xsl:with-param name="curr_node" select="./branches/branch[1]"/>
+            <xsl:with-param name="index_count" select="$index_count"/>
+            <xsl:with-param name="index" select="1"/>
         </xsl:call-template>
     </xsl:variable>
 
@@ -36,10 +47,14 @@
 
 <!-- returns list of shortest paths to each node -->
 <xsl:template name="find_shortest_paths">
-    <xsl:param name="target_index"/> <!-- index of last element -->
+    <xsl:param name="index_count"/> <!-- how many branches are there? -->
     <xsl:param name="list_of_paths"/> <!-- list => _to;cost;prev_ -->
-    <xsl:param name="curr_node"/> <!-- current iteration is above this node -->
+    <xsl:param name="index"/> <!-- index of the node that we are looking at -->
 
+    <!--xsl:value-of select="$index"/-->
+
+    <!-- init some vars readability++ -->
+    <xsl:variable name="curr_node" select="./*[position() = $index]"/> <!-- current iteration is above this node -->
     <xsl:variable name="curr_index" select="$curr_node/@start"/> <!-- where are we ? -->
     <xsl:variable name="curr_to_index" select="$curr_node/@stop"/> <!-- path goes to ? -->
 
@@ -97,11 +112,11 @@
     <!-- recursion -->
     <xsl:choose>
         <!-- not found yet, 'zoek ma wa verder' -->
-        <xsl:when test="$curr_to_index != $target_index">
+        <xsl:when test="$index != $index_count">
             <xsl:call-template name="find_shortest_paths">
-                <xsl:with-param name="target_index" select="$target_index"/>
+                <xsl:with-param name="index_count" select="$index_count"/>
+                <xsl:with-param name="index" select="$index + 1"/>
                 <xsl:with-param name="list_of_paths" select="$new_list_of_paths"/>
-                <xsl:with-param name="curr_node" select="./following::sibling[1]"/>
             </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
@@ -122,10 +137,9 @@
             <!-- path is defined, return the cost -->
             <xsl:value-of select="substring-before(substring-after($list_of_paths , $query), ';')"/>
         </xsl:when>
-        <xsl:otherwise>
-            <!-- path undefined => infinte cost -->
-            <xsl:value-of select="INF"/>
-        </xsl:otherwise>
+
+        <!-- path undefined => infinte cost -->
+        <xsl:otherwise>INF</xsl:otherwise>
     </xsl:choose>
 </xsl:template>
 
@@ -135,8 +149,12 @@
     <xsl:param name="to"/>
 
     <xsl:variable name="query" select="concat('_' , $to , ';')"/>
-
-    <xsl:value-of select="concat( $query , substring-before(substring-after($list_of_paths , $query), '_'))"/>
+    <xsl:choose>
+        <xsl:when test="contains($list_of_paths , $query)">
+            <xsl:value-of select="concat( $query , substring-before(substring-after($list_of_paths , $query), '_'))"/>
+        </xsl:when>
+        <xsl:otherwise>UNDEF</xsl:otherwise>
+    </xsl:choose>
 </xsl:template>
 
 </xsl:stylesheet>
