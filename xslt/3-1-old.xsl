@@ -27,8 +27,8 @@
     <xsl:variable name="curr_cost" select="$cost_so_far + $curr_branch/@cost"/>
 
     <!-- write -->
-    <!--branch>
-        <!- keep orig values ->
+    <branch>
+        <!-- keep orig values -->
         <xsl:attribute name="cost">
             <xsl:value-of select="$curr_branch/@cost"/>
         </xsl:attribute>
@@ -49,24 +49,27 @@
             <xsl:value-of select="$curr_branch/@previous"/>
         </xsl:attribute>
 
-        <!- add the cost for the path ->
+        <!-- add the cost for the path -->
         <xsl:attribute name="total_cost">
             <xsl:value-of select="$curr_cost"/>
         </xsl:attribute>
-    </branch-->
+    </branch>
 
     <!-- recusion -->
-    <!--xsl:if test="$curr_index &lt; $goal_index">
+    <xsl:if test="$curr_index &lt; $goal_index">
         <xsl:for-each select="../branch[@previous = $curr_index]">
-            <xsl:call-template name="write_total_cost">
-                <xsl:with-param name="cost_so_far" select="$curr_cost"/>
-                <xsl:with-param name="prev_index" select="$curr_index"/>
-                <xsl:with-param name="curr_branch" select="."/>
-                <xsl:with-param name="goal_index" select="$goal_index"/>
-            </xsl:call-template>
+
+            <xsl:if test="1 > ./@ratio">
+                <xsl:call-template name="write_total_cost">
+                    <xsl:with-param name="cost_so_far" select="$curr_cost"/>
+                    <xsl:with-param name="prev_index" select="$curr_index"/>
+                    <xsl:with-param name="curr_branch" select="."/>
+                    <xsl:with-param name="goal_index" select="$goal_index"/>
+                </xsl:call-template>
+            </xsl:if>
         </xsl:for-each>
 
-    </xsl:if-->
+    </xsl:if>
 </xsl:template>
 
 </xsl:stylesheet>
