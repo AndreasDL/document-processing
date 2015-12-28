@@ -63,7 +63,7 @@
     <!--xsl:value-of select="concat('line from ', $start_index, ' to ' , $stop_index)"/-->
     <xsl:if test="string-length($stop_index) > 0">
         <line>
-            <xsl:attribute name="line_ratio">
+            <xsl:attribute name="ratio">
                 <xsl:call-template name="get_ratio">
                     <xsl:with-param name="to" select="$stop_index"/>
                     <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
