@@ -4,14 +4,14 @@
 
 
 <!-- init template -->
-<xsl:template match="branches">
-    <xsl:variable name="target_node" select= "./branch[last()]/@stop"/>
+<xsl:template match="paragraph">
+    <xsl:variable name="target_node" select= "./branches/branch[last()]/@stop"/>
 
     <!-- get list with shortest path to each node in tree -->
     <xsl:variable name="shortest_paths">
         <xsl:call-template name="find_shortest_paths">
             <xsl:with-param name="list_of_paths">_1;0;undef_</xsl:with-param> <!-- list => _to;cost;prev_ -->
-            <xsl:with-param name="index_count" select="count(./*)"/>
+            <xsl:with-param name="index_count" select="count(./branches/*)"/>
             <xsl:with-param name="index" select="1"/>
         </xsl:call-template>
     </xsl:variable>
@@ -20,11 +20,28 @@
     <xsl:value-of select="$shortest_paths"/>
     <xsl:text>&#xa;</xsl:text-->
 
-    <xsl:call-template name="extract_path">
-        <xsl:with-param name="shortest_paths" select="$shortest_paths"/>
-        <xsl:with-param name="curr_index" select="$target_node"/>
-        <xsl:with-param name="path"><xsl:value-of select="$target_node"/></xsl:with-param>
+    <xsl:variable name="path">
+        <xsl:call-template name="extract_path">
+            <xsl:with-param name="shortest_paths" select="$shortest_paths"/>
+            <xsl:with-param name="curr_index" select="$target_node"/>
+            <xsl:with-param name="path"><xsl:value-of select="$target_node"/></xsl:with-param>
+        </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:text>&#xa;</xsl:text>
+    <xsl:value-of select="$path"/>
+    <xsl:text>&#xa;</xsl:text>
+
+    <xsl:call-template name="format_output">
+
     </xsl:call-template>
+
+
+</xsl:template>
+
+<xsl:template name="format_output">
+    <xsl:param name="path"/> <!-- list firstnode;node;node;node;targetnode-->
+
 
 </xsl:template>
 
@@ -74,7 +91,7 @@
     <!--xsl:value-of select="$index"/-->
 
     <!-- init some vars readability++ -->
-    <xsl:variable name="curr_node" select="./*[position() = $index]"/> <!-- current iteration is above this node -->
+    <xsl:variable name="curr_node" select="./branches/*[position() = $index]"/> <!-- current iteration is above this node -->
     <xsl:variable name="curr_index" select="$curr_node/@start"/> <!-- where are we ? -->
     <xsl:variable name="curr_to_index" select="$curr_node/@stop"/> <!-- path goes to ? -->
 
