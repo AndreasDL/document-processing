@@ -2,9 +2,18 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output encoding="UTF-8" omit-xml-declaration="no" indent="yes"/>
 
+<xsl:template match="@*|node()">
+    <xsl:copy>
+        <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+</xsl:template>
+
 
 <!-- init template -->
 <xsl:template match="paragraph">
+    <paragraph>
+    <xsl:apply-templates select="@*"/>
+
     <xsl:variable name="target_node" select= "./branches/branch[last()]/@stop"/>
 
     <!-- get list with shortest path to each node in tree -->
@@ -33,14 +42,15 @@
     <xsl:text>&#xa;</xsl:text>
 
     <xsl:call-template name="format_output">
-
+        <xsl:with-param name="path" select="path"/>
     </xsl:call-template>
 
-
+    </paragraph>
 </xsl:template>
 
 <xsl:template name="format_output">
     <xsl:param name="path"/> <!-- list firstnode;node;node;node;targetnode-->
+
 
 
 </xsl:template>
