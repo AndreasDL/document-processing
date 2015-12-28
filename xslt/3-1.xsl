@@ -135,7 +135,7 @@
     <!-- init some vars readability++ -->
     <xsl:variable name="curr_node" select="./branches/*[position() = $index]"/> <!-- current iteration is above this node -->
     <xsl:variable name="curr_index" select="$curr_node/@start"/> <!-- where are we ? -->
-    <xsl:variable name="curr_to_index" select="$curr_node/@stop"/> <!-- path goes to ? -->
+    <xsl:variable name="curr_to_index" select="$curr_node/@end"/> <!-- path goes to ? -->
     <xsl:variable name="curr_ratio" select="$curr_node/@ratio"/>
 
     <!-- cost to current node, should always be defined -->
@@ -355,7 +355,5 @@
         <xsl:with-param name="to" select="2"/>
     </xsl:call-template>
     <xsl:text>&#xa;</xsl:text>
-
-
 </xsl:template>
 </xsl:stylesheet>

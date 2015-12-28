@@ -1,0 +1,19 @@
+_0;13;1;21 Lorem .. eros
+_21;5;1;47 nisi, .. Sed
+_47;5;1;69 pharetra .. egestas
+_69;1;1;95 dolor. .. vitae
+_95;0;1;117 iaculis. .. libero.
+_117;0;1;141 Etiam .. at
+_141;0;1;163 egestas .. malesuada
+_163;0;1;190 fames .. lacinia.
+
+
+_0;4277;1;88 --> Nam .. mollis.
+_88;2134;1;165 --> Praesent .. dictum,
+_165;1833;1;256 --> nulla .. non
+_256;1271;1;340 --> tortor. .. Sed
+_340;330;1;431 --> ac .. porta
+_431;193;1;522 --> orci, .. feugiat.     
+_522;184;1;606 --> Fusce. .. purus,
+_606;47;1;704 --> vitae .. purus
+_704;0;1;774 --> fermentum, .. feugiat.

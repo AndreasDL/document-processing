@@ -335,7 +335,7 @@
             <xsl:value-of select="$start_index"/>
         </xsl:attribute>
 
-        <xsl:attribute name="stop">
+        <xsl:attribute name="end">
             <xsl:value-of select="$stop_index"/>
         </xsl:attribute>
 
