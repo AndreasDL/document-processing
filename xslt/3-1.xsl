@@ -7,7 +7,7 @@
 <xsl:template match="branches">
     <xsl:variable name="target_node" select= "./branch[last()]/@stop"/>
 
-        <!-- get list with shortest path to each node in tree -->
+    <!-- get list with shortest path to each node in tree -->
     <xsl:variable name="shortest_paths">
         <xsl:call-template name="find_shortest_paths">
             <xsl:with-param name="list_of_paths">_1;0;undef_</xsl:with-param> <!-- list => _to;cost;prev_ -->
@@ -20,12 +20,12 @@
     <xsl:value-of select="$shortest_paths"/>
     <xsl:text>&#xa;</xsl:text-->
 
-    <!-- get the path -->
     <xsl:call-template name="extract_path">
         <xsl:with-param name="shortest_paths" select="$shortest_paths"/>
         <xsl:with-param name="curr_index" select="$target_node"/>
         <xsl:with-param name="path"><xsl:value-of select="$target_node"/></xsl:with-param>
     </xsl:call-template>
+
 </xsl:template>
 
 <!-- get shortest path from the list of shortest paths -->
