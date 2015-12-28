@@ -61,29 +61,26 @@
 
     <xsl:variable name="stop_index" select="substring-before($path, ';')"/>
     <!--xsl:value-of select="concat('line from ', $start_index, ' to ' , $stop_index)"/-->
+    <xsl:if test="string-length($stop_index) > 0">
+        <line>
+            <xsl:attribute name="line_ratio">
+                <xsl:call-template name="get_ratio">
+                    <xsl:with-param name="to" select="$stop_index"/>
+                    <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
+                </xsl:call-template>
+                <!--xsl:value-of select="./branches/branch[@start=$start_index and @stop=$stop_index]/@ratio"/-->
+            </xsl:attribute>
 
-    <line>
-        <xsl:attribute name="line_ratio">
-            <xsl:call-template name="get_ratio">
-                <xsl:with-param name="to" select="$stop_index"/>
-                <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
-            </xsl:call-template>
-            <!--xsl:value-of select="./branches/branch[@start=$start_index and @stop=$stop_index]/@ratio"/-->
-        </xsl:attribute>
+            <xsl:for-each select="./content/*[position() >= $start_index and $stop_index >= position()]">
+                <xsl:copy>
+                    <xsl:apply-templates select="node()|@*"/>
+                </xsl:copy>
+            </xsl:for-each>
+        </line>
 
-        <xsl:for-each select="./content/*[position() >= $start_index and $stop_index >= position()]">
-            <xsl:copy>
-                <xsl:apply-templates select="node()|@*"/>
-            </xsl:copy>
-        </xsl:for-each>
-    </line>
-
-    <!-- recursion -->
-    <xsl:variable name="new_path" select="substring-after($path, ';')"/>
-
-    <xsl:if test="string-length($new_path) > 0">
+        <!-- recursion -->
         <xsl:call-template name="format_output">
-            <xsl:with-param name="path" select="$new_path"/>
+            <xsl:with-param name="path" select="substring-after($path, ';')"/>
             <xsl:with-param name="start_index" select="$stop_index + 1"/>
             <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
         </xsl:call-template>
