@@ -8,6 +8,7 @@
         <xsl:apply-templates select="@*[not(name(.) = 'index')]|node()"/>
     </xsl:copy>
 </xsl:template>
+
 <!-- Transform the paragraphs -->
 <xsl:template match="paragraph">
     <xsl:copy>
@@ -16,6 +17,7 @@
         
         <xsl:variable name="nrBranches" select="count(./branches/*)"/>
         <xsl:if test="$nrBranches &gt; 0">
+            
             <!-- Find for each break position the branch that leads to the next break position
             on the path with minimal cost to the final paragraph break. The output is structured as:
             '_breakPositionId1;costSinceLastInfOnPathToStop1;nrInfsOnPathToStop1;branchId1_breakPositionId2...;branchIdN_'-->

@@ -301,7 +301,6 @@
     <xsl:param name="prev_break"/>
     <xsl:param name="start_index"/>
     <xsl:param name="stop_index"/>
-
     <branch>
         <xsl:choose>
             <xsl:when test="$ratio = 0">
