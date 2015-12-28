@@ -16,9 +16,9 @@
         </xsl:call-template>
     </xsl:variable>
    
-    <xsl:text>&#xa;</xsl:text>
+    <!--xsl:text>&#xa;</xsl:text>
     <xsl:value-of select="$shortest_paths"/>
-    <xsl:text>&#xa;</xsl:text>
+    <xsl:text>&#xa;</xsl:text-->
 
     <!-- get the path -->
     <xsl:call-template name="extract_path">
@@ -28,13 +28,14 @@
     </xsl:call-template>
 </xsl:template>
 
+<!-- get shortest path from the list of shortest paths -->
 <xsl:template name="extract_path">
     <xsl:param name="shortest_paths"/>
     <xsl:param name="curr_index"/>
     <xsl:param name="path"/>
     
-    <xsl:value-of select="concat('target', $curr_index)"/>
-    <xsl:text>&#xa;</xsl:text>
+    <!--xsl:value-of select="concat('target', $curr_index)"/>
+    <xsl:text>&#xa;</xsl:text-->
 
     <xsl:variable name="previous">
         <xsl:call-template name="get_previous">
@@ -43,8 +44,8 @@
         </xsl:call-template>
     </xsl:variable>
 
-    <xsl:value-of select="concat('previous', $previous)"/>
-    <xsl:text>&#xa;</xsl:text>
+    <!--xsl:value-of select="concat('previous', $previous)"/>
+    <xsl:text>&#xa;</xsl:text-->
 
     <xsl:choose>
         <xsl:when test="$previous != 'undef'">
@@ -62,7 +63,6 @@
             <xsl:value-of select="$path"/>
         </xsl:otherwise>
     </xsl:choose>
-
 </xsl:template>
 
 <!-- returns list of shortest paths to each node -->
