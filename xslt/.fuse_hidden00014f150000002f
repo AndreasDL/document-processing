@@ -218,7 +218,8 @@
 
                         <xsl:with-param name="prev_break" select="$curr_break"/>
                         <xsl:with-param name="curr_break" select="0"/>
-                                                
+
+                        
                         <!-- last element might be part of new paragraph -->
                         <xsl:with-param name="l_prev">
                             <xsl:choose>
@@ -311,6 +312,18 @@
     <xsl:param name="start_index"/>
     <xsl:param name="stop_index"/>
     <!--xsl:param name="last_word"/-->
+    
+    <!-- total cost -->
+    <xsl:variable name="total_cost">
+        <xsl:choose>
+            <xsl:when test="$prev_break = 0">
+                <xsl:value-of select="$cost"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="/*[@stop = $prev_break]@cost"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
 
     <branch>
         <xsl:choose>
@@ -347,6 +360,9 @@
             <xsl:value-of select="$last_word"/>
         </xsl:attribute-->
         
+        <xsl:attribute name="total_cost">
+            <xsl:value-of select="$total_cost"/>
+        </xsl:attribute>
     </branch>
 </xsl:template>
 </xsl:stylesheet>    
