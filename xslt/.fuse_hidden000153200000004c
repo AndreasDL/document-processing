@@ -39,9 +39,9 @@
             <xsl:with-param name="index" select="1"/>
         </xsl:call-template>
     </xsl:variable>
-    <xsl:text>&#xa;</xsl:text>
+
     <xsl:value-of select="$shortest_paths"/>
-    <xsl:text>&#xa;</xsl:text>
+
 
 </xsl:template>
 
@@ -83,9 +83,6 @@
     <!-- save lowest cost -->
     <xsl:variable name="new_line" select="concat('_', $curr_to_index , ';', $new_cost , ';' , $curr_node/@previous , '_' )"/>
 
-    <!--xsl:text>&#xa;</xsl:text>    
-    <xsl:value-of select="concat('new: ' , $new_line)"/-->    
-
     <!-- adjust the list when needed -->
     <xsl:variable name="new_list_of_paths">
         <xsl:choose>
@@ -102,11 +99,6 @@
                         <xsl:with-param name="to" select="$curr_to_index"/>
                     </xsl:call-template>
                 </xsl:variable>
-
-                <!--xsl:text>&#xa;</xsl:text>    
-                <xsl:value-of select="concat('old: ' , $old_line)"/>
-                <xsl:text>&#xa;</xsl:text--> 
-
                 <xsl:value-of select="concat(substring-before($list_of_paths, $old_line) , $new_line , substring-after($list_of_paths, $old_line))"/>
             </xsl:when>
 
@@ -116,10 +108,6 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:variable>
-
-    <xsl:text>&#xa;</xsl:text>
-    <xsl:value-of select="$new_list_of_paths"/>
-    <xsl:text>&#xa;</xsl:text>
 
     <!-- recursion -->
     <xsl:choose>
@@ -163,7 +151,7 @@
     <xsl:variable name="query" select="concat('_' , $to , ';')"/>
     <xsl:choose>
         <xsl:when test="contains($list_of_paths , $query)">
-            <xsl:value-of select="concat( $query , substring-before(substring-after($list_of_paths , $query), '_') , '_')"/>
+            <xsl:value-of select="concat( $query , substring-before(substring-after($list_of_paths , $query), '_'))"/>
         </xsl:when>
         <xsl:otherwise>UNDEF</xsl:otherwise>
     </xsl:choose>
