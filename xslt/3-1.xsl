@@ -37,12 +37,13 @@
         </xsl:call-template>
     </xsl:variable>
 
-    <xsl:text>&#xa;</xsl:text>
+    <!--xsl:text>&#xa;</xsl:text>
     <xsl:value-of select="$path"/>
-    <xsl:text>&#xa;</xsl:text>
+    <xsl:text>&#xa;</xsl:text-->
 
     <xsl:call-template name="format_output">
-        <xsl:with-param name="path" select="path"/>
+        <xsl:with-param name="path" select="substring-after($path, ';')"/>
+        <xsl:with-param name="start_index" select="substring-before($path, ';')"/>
     </xsl:call-template>
 
     </paragraph>
@@ -50,9 +51,28 @@
 
 <xsl:template name="format_output">
     <xsl:param name="path"/> <!-- list firstnode;node;node;node;targetnode-->
+    <xsl:param name="start_index"/>
 
+    <xsl:variable name="stop_index" select="substring-before($path, ';')"/>
 
+    <xsl:value-of select="concat('line from ', $start_index, ' to ' , $stop_index)"/>
 
+    <line>
+        <xsl:for-each select="./*[position() >= $start_index and $stop_index >= position()]">
+            <xsl:value-of select="."/>
+        </xsl:for-each>
+    </line>
+
+    <!-- recursion -->
+    <xsl:variable name="new_path" select="substring-after($path, ';')"/>
+
+    <xsl:if test="string-length($new_path) > 0">
+        <xsl:call-template name="format_output">
+            <xsl:with-param name="path" select="$new_path"/>
+            <xsl:with-param name="start_index" select="$stop_index"/>
+
+        </xsl:call-template>
+    </xsl:if>
 </xsl:template>
 
 <!-- get shortest path from the list of shortest paths -->
