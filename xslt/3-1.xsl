@@ -48,8 +48,8 @@
     <xsl:call-template name="format_output">
         <xsl:with-param name="path" select="substring-after($path, ';')"/>
         <xsl:with-param name="start_index" select="substring-before($path, ';')"/>
+        <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
     </xsl:call-template>
-
 
     </paragraph>
 </xsl:template>
@@ -57,13 +57,18 @@
 <xsl:template name="format_output">
     <xsl:param name="path"/> <!-- list firstnode;node;node;node;targetnode-->
     <xsl:param name="start_index"/>
+    <xsl:param name="list_of_paths"/>
 
     <xsl:variable name="stop_index" select="substring-before($path, ';')"/>
     <!--xsl:value-of select="concat('line from ', $start_index, ' to ' , $stop_index)"/-->
 
     <line>
         <xsl:attribute name="line_ratio">
-            <xsl:value-of select="./branches/branch[@start=$start_index and @stop=$stop_index]/@ratio"/>
+            <xsl:call-template name="get_ratio">
+                <xsl:with-param name="to" select="$stop_index"/>
+                <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
+            </xsl:call-template>
+            <!--xsl:value-of select="./branches/branch[@start=$start_index and @stop=$stop_index]/@ratio"/-->
         </xsl:attribute>
 
         <xsl:for-each select="./content/*[position() >= $start_index and $stop_index >= position()]">
@@ -80,13 +85,14 @@
         <xsl:call-template name="format_output">
             <xsl:with-param name="path" select="$new_path"/>
             <xsl:with-param name="start_index" select="$stop_index + 1"/>
+            <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
         </xsl:call-template>
     </xsl:if>
 </xsl:template>
 
 <!-- get shortest path from the list of shortest paths -->
 <xsl:template name="extract_path">
-    <xsl:param name="shortest_paths"/><!-- list => _to;cost;ratio;prev_ -->
+    <xsl:param name="shortest_paths"/> <!-- list => _to;cost;ratio;prev_ -->
     <xsl:param name="curr_index"/>
     <xsl:param name="path"/>
     
@@ -300,8 +306,6 @@
         <xsl:otherwise>UNDEF</xsl:otherwise>
     </xsl:choose>
 </xsl:template>
-
-
 
 <!-- check functions -->
 <xsl:template name="debug">
