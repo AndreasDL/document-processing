@@ -118,12 +118,12 @@
     <xsl:text>&#xa;</xsl:text>
 
     <!-- readability++ -->
-    <xsl:variable name="curr_element" select="$curr_para/*[position() = $stop_index]"/>
-    <xsl:variable name="next_element" select="$curr_para/*[position() = $stop_index+1]"/>
+    <xsl:variable name="curr_element" select="$curr_para[position() = $stop_index]"/>
+    <xsl:variable name="next_element" select="$curr_para[position() = $stop_index+1]"/>
 
-    <!--xsl:value-of select="$curr_element/node()"/>
+    <xsl:value-of select="$curr_element/node()"/>
     <xsl:value-of select="$curr_element/@shrinkability"/>
-    <xsl:text>&#xa;</xsl:-->
+    <xsl:text>&#xa;</xsl:text>
 
     <!-- update l , y, z values -->
     <xsl:variable name="l_curr">
@@ -187,7 +187,7 @@
         </xsl:call-template>
     </xsl:variable>
     
-    <xsl:value-of select="concat($l_max, '-' , $l_curr, ' - ' , $y_curr , ' - ', $z_curr , ' - ', $ratio )"/>
+    <xsl:value-of select="concat($l_curr, ' - ' , $y_curr , ' - ', $z_curr , ' - ', $ratio )"/>
     <xsl:text>&#xa;</xsl:text>
 
     <!-- can we split ? -->
@@ -238,7 +238,7 @@
     and
         $l_max > ($l_curr - $z_curr)
     ">
-        <!--xsl:value-of select="concat('recursion to', ($stop_index + 1) , '(stop)')"/-->
+        <xsl:value-of select="concat('recurions to', ($stop_index + 1) , '(stop)')"/>
 
         <xsl:call-template name="find_end">
             <!-- readonly -->
@@ -263,45 +263,46 @@
     <xsl:param name="y_curr"/>
     <xsl:param name="z_curr"/>
 
-    <xsl:choose>
-        <!-- perfect fit -->
-        <xsl:when test="$l_max = $l_curr">
-            <xsl:value-of select="0"/>
-        </xsl:when>
-        
-        <!-- stretch ($l_curr < $l_max) -->
-        <xsl:when test="$l_max > $l_curr">
-            <xsl:choose>
-                <xsl:when test="$y_curr != 'INF'">
-                    <xsl:value-of select="0"/>
-                </xsl:when>
-                <xsl:when test="$y_curr > 0">
-                    <xsl:value-of select="($l_max - ($l_curr)) div $y_curr"/>
-                </xsl:when>
-                
-                <!-- undef -->
-                <xsl:otherwise>
-                    <xsl:value-of select="NaN"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:when>
+    <xsl:variable name="ratio">
+        <xsl:choose>
+            <!-- perfect fit -->
+            <xsl:when test="$l_max = $l_curr">
+                <xsl:value-of select="0"/>
+            </xsl:when>
+            
+            <!-- stretch ($l_curr < $l_max) -->
+            <xsl:when test="$l_max > $l_curr">
+                <xsl:choose>
+                    <!-- normal case -->
+                    <xsl:when test="0 > $y_curr and $y_curr != 'INF'">
+                        <xsl:value-of select="($l_max - ($l_curr)) div $y_curr"/>
+                    </xsl:when>
+                    
+                    <!-- undef -->
+                    <xsl:otherwise>
+                        <xsl:value-of select="NaN"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
 
-        <!-- shrink ($l_curr > $l_max) -->
-        <xsl:otherwise>
-            <xsl:choose>
-                <xsl:when test="$z_curr = 'INF'">
-                    <xsl:value-of select="0"/>
-                </xsl:when>
-                <xsl:when test="$z_curr > 0">
-                    <xsl:value-of select="($l_max - ($l_curr)) div $z_curr"/>
-                </xsl:when>
-                <!-- undef -->
-                <xsl:otherwise>
-                    <xsl:value-of select="'NaN'"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:otherwise>
-    </xsl:choose>
+            <!-- shrink ($l_curr > $l_max) -->
+            <xsl:otherwise>
+                <xsl:choose>
+                    <!-- normal case -->
+                    <xsl:when test="0 > $z_curr and $z_curr != 'INF'">
+                        <xsl:value-of select="($l_max - ($l_curr)) div $z_curr"/>
+                    </xsl:when>
+                    
+                    <!-- undef -->
+                    <xsl:otherwise>
+                        <xsl:value-of select="NaN"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+
+    <xsl:value-of select="$ratio"/>
 </xsl:template>
 
 <!-- calculate the cost -->
