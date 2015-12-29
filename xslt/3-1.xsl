@@ -2,12 +2,36 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output encoding="UTF-8" omit-xml-declaration="no" indent="yes"/>
 
+<!-- code approve by an owl
+"|||||,,,..   ..,,,|||||"
+ '||(    |||,|||    )||'
+  "||,,,,. "|" .,,,,||"
+   .d8888b.   .d8888b.
+  o8'  o '8o o8'o   `8o
+  o8.    .8o o8.    .8o
+   `Y8888P'   `Y8888P'
+  ,||''|| \   / ||''||,
+ ,||   ||, \ / .||   ||,
+ ||     ||  `  ||     ||
+,||     '||   ||'     ||,
+||      '||   ||'      ||
+||       |;   ;|       ||
+||      ,|     |,      ||
+||,    ,||     ||,    ,||
+ ||,  ,|||     |||,  ,||
+ '||,,||||,...,||||,,||
+   `|||..."|||"...|||'
+ %%%%%WWWW%%%%%%WWWW%%%%%
+ `````""3$F""""#$F"""""""
+        @$.... '$B
+       d$$$$$$$$$$:
+-->
+
 <xsl:template match="@*|node()">
     <xsl:copy>
         <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
 </xsl:template>
-
 
 <!-- init template -->
 <xsl:template match="paragraph">

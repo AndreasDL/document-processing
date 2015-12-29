@@ -2,6 +2,28 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="xml" encoding="UTF-8" omit-xml-declaration="no" indent="yes"/>    
 
+<!-- Monkey approves
+
+                     .-"""-.
+                   _/-=-.   \
+                  (_|a a/   |_
+                   / "  \   ,_)
+              _    \`=' /__/
+             / \_  .;''  `-.
+             \___)//      ,  \
+              \ \/;        \  \
+               \_.|         | |
+                .-\ '     _/_/
+              .'  _;.    (_  \
+             /  .'   `\   \\_/
+            |_ /       |  |\\
+           /  _)       /  / ||
+          /  /       _/  /  //
+          \_/       ( `-/  ||
+                    /  /   \\ .-.
+                    \_/     \'-'/
+                             `"`
+-->
 <!-- Copy all other elements (document)-->
 <xsl:template match="@*|node()">
     <xsl:copy>

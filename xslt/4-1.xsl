@@ -2,6 +2,23 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="xml" indent="yes" doctype-public="-//W3C//DTD SVG 1.0//EN" doctype-system="http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" media-type="image/svg" />
 
+<!-- the lion king approves with the result :D
+
+             ,%%%%%%%%,
+           ,%%/\%%%%/\%%
+          ,%%%\c "" J/%%%
+ %.       %%%%/ o  o \%%%
+ `%%.     %%%%    _  |%%%
+  `%%     `%%%%(__Y__)%%'
+  //       ;%%%%`\-/%%%'
+ ((       /  `%%%%%%%'
+  \\    .'          |
+   \\  /       \  | |
+    \\/         ) | |
+ jgs \         /_ | |__
+     (___________)))))))
+
+-->
 <xsl:template name="getHeightRecursion">
     <xsl:param name="prev_height"/>
     <xsl:param name="index" />
@@ -207,8 +224,8 @@
         </xsl:choose>
     </xsl:variable>
 
-    <xsl:value-of select="$x_new"/>
-    <xsl:text>&#xa;</xsl:text>
+    <!--xsl:value-of select="$x_new"/>
+    <xsl:text>&#xa;</xsl:text-->
 
     <xsl:if test="$line_count > $index">
         <xsl:call-template name="convertLine">
