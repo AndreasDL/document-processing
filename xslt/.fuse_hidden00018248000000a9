@@ -263,6 +263,8 @@
     <xsl:param name="y_curr"/>
     <xsl:param name="z_curr"/>
 
+    <xsl:value-of select="hoi"/>
+
     <xsl:choose>
         <!-- perfect fit -->
         <xsl:when test="$l_max = $l_curr">
@@ -272,7 +274,7 @@
         <!-- stretch ($l_curr < $l_max) -->
         <xsl:when test="$l_max > $l_curr">
             <xsl:choose>
-                <xsl:when test="$y_curr = 'INF'">
+                <xsl:when test="$y_curr != 'INF'">
                     <xsl:value-of select="0"/>
                 </xsl:when>
                 <xsl:when test="$y_curr > 0">
