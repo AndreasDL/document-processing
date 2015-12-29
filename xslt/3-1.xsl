@@ -14,7 +14,7 @@
     <paragraph>
     <xsl:apply-templates select="@*"/>
 
-    <xsl:variable name="target_node" select= "./branches/branch[last()]/@stop"/>
+    <xsl:variable name="target_node" select= "./branches/branch[last()]/@end"/>
 
     <!--xsl:call-template name="debug">
         <xsl:with-param name="shortest_paths">_1;0;0;undef_</xsl:with-param>
@@ -33,23 +33,23 @@
     <xsl:value-of select="$shortest_paths"/>
     <xsl:text>&#xa;</xsl:text-->
 
-    <xsl:variable name="path">
+    <!--xsl:variable name="path">
         <xsl:call-template name="extract_path">
             <xsl:with-param name="shortest_paths" select="$shortest_paths"/>
             <xsl:with-param name="curr_index" select="$target_node"/>
             <xsl:with-param name="path"><xsl:value-of select="$target_node"/></xsl:with-param>
         </xsl:call-template>
-    </xsl:variable>
+    </xsl:variable-->
 
     <!--xsl:text>&#xa;</xsl:text>
     <xsl:value-of select="$path"/>
     <xsl:text>&#xa;</xsl:text-->
 
-    <xsl:call-template name="format_output">
+    <!--xsl:call-template name="format_output">
         <xsl:with-param name="path" select="substring-after($path, ';')"/>
         <xsl:with-param name="start_index" select="substring-before($path, ';')"/>
         <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
-    </xsl:call-template>
+    </xsl:call-template-->
 
     </paragraph>
 </xsl:template>
@@ -130,7 +130,7 @@
     <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;prev_ -->
     <xsl:param name="index"/> <!-- index of the node that we are looking at -->
 
-    <!--xsl:value-of select="$index"/-->
+    <xsl:value-of select="$index"/>
 
     <!-- init some vars readability++ -->
     <xsl:variable name="curr_node" select="./branches/*[position() = $index]"/> <!-- current iteration is above this node -->
@@ -185,7 +185,7 @@
 
                 <!--xsl:text>&#xa;</xsl:text>    
                 <xsl:value-of select="concat('old: ' , $old_line)"/>
-                <xsl:text>&#xa;</xsl:text--> 
+                <xsl:text>&#xa;</xsl:text-->
 
                 <xsl:value-of select="concat(substring-before($list_of_paths, $old_line) , $new_line , substring-after($list_of_paths, $old_line))"/>
             </xsl:when>
@@ -197,9 +197,9 @@
         </xsl:choose>
     </xsl:variable>
 
-    <!--xsl:text>&#xa;</xsl:text>
+    <xsl:text>&#xa;</xsl:text>
     <xsl:value-of select="$new_list_of_paths"/>
-    <xsl:text>&#xa;</xsl:text-->
+    <xsl:text>&#xa;</xsl:text>
 
     <!-- recursion -->
     <xsl:choose>

@@ -8,8 +8,8 @@
             <transformation>1-1.xsl</transformation>
         </step>
         <step fallback="false">
-            <transformation>2-1-pieter.xsl</transformation>
-            <transformation>2-2-pieter.xsl</transformation>
+            <transformation>2-1.xsl</transformation>
+            <transformation>2-2.xsl</transformation>
         </step>
         <step fallback="false">
             <transformation>3-1.xsl</transformation>

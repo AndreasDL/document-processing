@@ -106,32 +106,35 @@
                         <xsl:value-of select="0"/>
                     </xsl:when>
                     
-                    <!-- shrink -->
-                    <xsl:when test="$l_curr > $l_max">
-                        <xsl:value-of select="($l_max - ($l_curr)) div $z_curr"/>
-                    </xsl:when>
-
                     <!-- stretch ($l_curr < $l_max) -->
-                    <xsl:otherwise>
+                    <xsl:when test="$l_max > $l_curr">
                         <xsl:choose>
-                            <!-- stretch = inf => ratio = 0 -->
-                            <xsl:when test="number($y_curr) = 'NaN'">
-                                <xsl:value-of select="0"/>
-                            </xsl:when>
-                            
                             <!-- normal case -->
-                            <xsl:when test="$y_curr > 0">
+                            <xsl:when test="0 > $y_curr and $y_curr != 'INF'">
                                 <xsl:value-of select="($l_max - ($l_curr)) div $y_curr"/>
                             </xsl:when>
                             
-                            <!-- < 0 => undef -->
+                            <!-- undef -->
                             <xsl:otherwise>
-                                <xsl:value-of select="'NaN'"/>
+                                <xsl:value-of select="0"/>
                             </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:when>
+
+                    <!-- shrink ($l_curr > $l_max) -->
+                    <xsl:otherwise>
+                        <xsl:choose>
+                            <!-- normal case -->
+                            <xsl:when test="0 > $z_curr and $z_curr != 'INF'">
+                                <xsl:value-of select="($l_max - ($l_curr)) div $z_curr"/>
+                            </xsl:when>
                             
+                            <!-- undef -->
+                            <xsl:otherwise>
+                                <xsl:value-of select="0"/>
+                            </xsl:otherwise>
                         </xsl:choose>
                     </xsl:otherwise>
-                </xsl:choose>
             </xsl:variable>
 
             <!-- Define the cost -->

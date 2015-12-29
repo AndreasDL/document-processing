@@ -165,7 +165,7 @@
                 <glue>
                     <xsl:attribute name="stretchability">-36</xsl:attribute>
                     <xsl:attribute name="shrinkability">0</xsl:attribute>
-                    <xsl:attribute name="width">0</xsl:attribute>
+                    <xsl:attribute name="width">12</xsl:attribute>
                 </glue>
                 <box>
                     <xsl:attribute name="width">0</xsl:attribute>
