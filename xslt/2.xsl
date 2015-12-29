@@ -50,14 +50,16 @@
 
             <!-- handle other elements in the paragraph -->
             <xsl:for-each select="$curr_para/*">
+
+                <!-- readability++ -->
                 <xsl:variable name="curr_element" select="."/>
-                <xsl:variable name="next_element" select="following-subling::*[1]"/>
+                <xsl:variable name="next_element" select="following-sibling::*[1]"/>
 
                 <!-- check if we are positioned at a possible breakpoint -->
                 <!-- possible break point: -->
                 <!-- 
                     - current element is a required of prohibited penalty that is < INF 
-                    - current element is a box (we'll ignore preceeding glue elements) and if the next element is not a penalty 
+                    - current element is a box (we'll ignore preceding glue elements) and if the next element is not a penalty 
                 -->
                 <xsl:if test="
                 (
@@ -71,15 +73,28 @@
                     and
                         name($next_element) != 'penalty' 
                 )">
-                    <!-- previous is the end position of the previous branch -->
-                    <xsl:variable name="prev_index" select="position()"/>
-                    <!-- start_index is the index of the first possible break -->
-                    <xsl:variable name="start_index" select="count(following-sibling::*[name() = 'box'][1]/preceding-sibling::*)+1" /> />
 
+                    <!-- start index = how many elements are before the first following box ? -->
+                    <xsl:variable name="next_box" select="following-sibling::*[name() = 'box'][1]"/>
+                    <xsl:variable name="start_index" select="count($next_box/preceding-sibling::*)"/>
 
-
+                    <!-- look for end points, when the start point is feasable -->
+                    <!-- start +1 cuz one based-->
+                    <xsl:if test="$start_index + 1 > position()">
+                        <xsl:call-template name="find_end">
+                            <!-- pass values -->
+                            <xsl:with-param name="curr_para" select="$curr_para"/>
+                            <xsl:with-param name="prev_index" select="position()"/>
+                            <xsl:with-param name="start_index" select="$start_index +1"/>
+                            <xsl:with-param name="l_max" select="$l_max"/>
+                            <!-- init values -->
+                            <xsl:with-param name="stop_index" select="$start_index"/>
+                            <xsl:with-param name="l_prev" select="0"/>
+                            <xsl:with-param name="y_prev" select="0"/>
+                            <xsl:with-param name="z_prev" select="0"/>
+                        </xsl:call-template>
+                    </xsl:if>
                 </xsl:if>
-
             </xsl:for-each>
         </branches>
 
@@ -87,8 +102,7 @@
     </xsl:copy>
 </xsl:template>
 
-
-<!-- find all branches, given a start and previous index -->
+<!-- find all branches, given a start and previous index & write them to output -->
 <xsl:template name="find_end">
     <!-- readonly -->
     <xsl:param name="curr_para"/>
@@ -230,6 +244,7 @@
                 <xsl:with-param name="z_prev" select="$z_curr"/>
             </xsl:call-template>
         </xsl:if>
+    </xsl:if>
 </xsl:template>
 
 <!-- calculate the ratio -->
