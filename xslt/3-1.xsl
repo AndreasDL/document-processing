@@ -16,48 +16,49 @@
 
     <xsl:variable name="target_node" select= "./branches/branch[last()]/@end"/>
 
-    <!--xsl:call-template name="debug">
-        <xsl:with-param name="shortest_paths">_1;0;0;undef_</xsl:with-param>
-    </xsl:call-template-->
+    <xsl:call-template name="debug">
+        <xsl:with-param name="shortest_paths">_1;2;3;4;undef_</xsl:with-param>
+    </xsl:call-template>
 
     <!-- get list with shortest path to each node in tree -->
-    <xsl:variable name="shortest_paths">
+    <!--xsl:variable name="shortest_paths">
         <xsl:call-template name="find_shortest_paths">
-            <xsl:with-param name="list_of_paths">_0;0;0;undef_</xsl:with-param> <!-- list => _to;cost;ratio;prev_ -->
+            <xsl:with-param name="list_of_paths">_0;0;0;0;undef_</xsl:with-param>
             <xsl:with-param name="index_count" select="count(./branches/*)"/>
             <xsl:with-param name="index" select="1"/>
         </xsl:call-template>
-    </xsl:variable>
+    </xsl:variable-->
    
     <!--xsl:text>&#xa;</xsl:text>
     <xsl:value-of select="$shortest_paths"/>
     <xsl:text>&#xa;</xsl:text-->
 
-    <xsl:variable name="path">
+    <!--xsl:variable name="path">
         <xsl:call-template name="extract_path">
             <xsl:with-param name="shortest_paths" select="$shortest_paths"/>
             <xsl:with-param name="curr_index" select="$target_node"/>
             <xsl:with-param name="path"><xsl:value-of select="$target_node"/></xsl:with-param>
         </xsl:call-template>
-    </xsl:variable>
+    </xsl:variable-->
 
     <!--xsl:text>&#xa;</xsl:text>
     <xsl:value-of select="$path"/>
     <xsl:text>&#xa;</xsl:text-->
 
-    <xsl:call-template name="format_output">
-        <xsl:with-param name="path" select="concat(substring-after($path, ';'), ';')"/>
+    <!-- add ; to end of path for easy string splitting -->
+    <!--xsl:call-template name="format_output">
+        <xsl:with-param name="path" select="concat(substring-after($path, ';'), ';')"/> 
         <xsl:with-param name="start_index" select="substring-before($path, ';')"/>
         <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
-    </xsl:call-template>
+    </xsl:call-template-->
 
     </paragraph>
 </xsl:template>
 
 <xsl:template name="format_output">
-    <xsl:param name="path"/> <!-- list firstnode;node;node;node;targetnode-->
+    <xsl:param name="path"/> <!-- list firstnode;node;node;node;targetnode; !!note ; at the end! important much--> 
     <xsl:param name="start_index"/>
-    <xsl:param name="list_of_paths"/>
+    <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;start;prev_ -->
 
     <xsl:variable name="stop_index" select="substring-before($path, ';')"/>
     <!--xsl:value-of select="concat('line from ', $start_index, ' to ' , $stop_index)"/-->
@@ -89,7 +90,7 @@
 
 <!-- get shortest path from the list of shortest paths -->
 <xsl:template name="extract_path">
-    <xsl:param name="shortest_paths"/> <!-- list => _to;cost;ratio;prev_ -->
+    <xsl:param name="shortest_paths"/> <!-- list => _to;cost;ratio;start;prev_ -->
     <xsl:param name="curr_index"/>
     <xsl:param name="path"/>
     
@@ -127,14 +128,17 @@
 <!-- returns list of shortest paths to each node -->
 <xsl:template name="find_shortest_paths">
     <xsl:param name="index_count"/> <!-- how many branches are there? -->
-    <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;prev_ -->
+    <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;start;prev_ -->
     <xsl:param name="index"/> <!-- index of the node that we are looking at -->
 
     <!-- init some vars readability++ -->
     <xsl:variable name="curr_node" select="./branches/*[position() = $index]"/> <!-- current iteration is above this node -->
     <xsl:variable name="curr_index" select="$curr_node/@previous"/> <!-- where are we ? -->
     <xsl:variable name="curr_to_index" select="$curr_node/@end"/> <!-- path goes to ? -->
+    
+    <!-- is also saved in the list -->
     <xsl:variable name="curr_ratio" select="$curr_node/@ratio"/>
+    <xsl:variable name="curr_start" select="$curr_node/@start"/>
 
     <!-- cost to current node -->
     <xsl:variable name="cost_to_current">
@@ -161,7 +165,7 @@
     </xsl:variable>
 
     <!-- save lowest cost -->
-    <xsl:variable name="new_line" select="concat('_', $curr_to_index , ';', $new_cost , ';' , $curr_ratio, ';' , $curr_index , '_' )"/> 
+    <xsl:variable name="new_line" select="concat('_', $curr_to_index , ';', $new_cost , ';' , $curr_ratio, ';' , $curr_start , ';' , $curr_index , '_' )"/> 
 
     <!-- adjust the list when needed -->
     <xsl:variable name="new_list_of_paths">
@@ -213,7 +217,7 @@
 
 <!-- get the entry from the list (used to replace) -->
 <xsl:template name="get_existing_line">
-    <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;prev_ -->
+    <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;start;prev_ -->
     <xsl:param name="to"/>
 
     <xsl:variable name="query" select="concat('_' , $to , ';')"/>
@@ -227,7 +231,7 @@
 
 <!-- check if we already have a path to the curr_to_index -->
 <xsl:template name="get_existing_cost">
-    <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;prev_ -->
+    <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;start;prev_ -->
     <xsl:param name="to"/>
 
     <xsl:variable name="line">
@@ -241,7 +245,7 @@
 
     <xsl:choose>
         <xsl:when test="$line != 'UNDEF'"> <!-- found -->
-            <!-- list => _to;cost;ratio;prev_ => cost -->
+            <!-- list => _to;cost;ratio;start;prev_ => cost -->
             <xsl:value-of select="substring-before( substring-after($line, $query) , ';' )"/>
         </xsl:when>
         <!-- path undefined => infinte cost -->
@@ -251,7 +255,7 @@
 
 <!-- get index of previous node -->
 <xsl:template name="get_previous">
-    <xsl:param name="list_of_paths"/><!-- list => _to;cost;prev_ -->
+    <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;start;prev_ -->
     <xsl:param name="to"/>
 
     <xsl:variable name="line">
@@ -266,7 +270,7 @@
     <xsl:choose>
         <xsl:when test="$line != 'UNDEF'"> <!-- found -->
             <!-- list => _to;cost;ratio;prev_ => prev -->
-            <xsl:value-of select="substring-before( substring-after( substring-after( substring-after($line, $query), ';' ), ';' ), '_')"/>
+            <xsl:value-of select="substring-before( substring-after( substring-after( substring-after( substring-after($line, $query), ';' ), ';' ), ';'), '_')"/>
         </xsl:when>
         <!-- path undefined => infinte cost -->
         <xsl:otherwise>UNDEF</xsl:otherwise>
@@ -275,7 +279,7 @@
 
 <!-- get index of previous node -->
 <xsl:template name="get_ratio">
-    <xsl:param name="list_of_paths"/><!-- list => _to;cost;prev_ -->
+    <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;start;prev_ -->
     <xsl:param name="to"/>
 
     <xsl:variable name="line">
@@ -289,8 +293,31 @@
 
     <xsl:choose>
         <xsl:when test="$line != 'UNDEF'"> <!-- found -->
-            <!-- list => _to;cost;ratio;prev_ => ratio -->
+            <!-- list => _to;cost;ratio;start;prev_ => ratio -->
             <xsl:value-of select="substring-before( substring-after( substring-after($line, $query), ';' ), ';' )"/>
+        </xsl:when>
+        <!-- path undefined => infinte cost -->
+        <xsl:otherwise>UNDEF</xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
+
+<xsl:template name="get_start">
+    <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;start;prev_ -->
+    <xsl:param name="to"/>
+
+    <xsl:variable name="line">
+        <xsl:call-template name="get_existing_line">
+            <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
+            <xsl:with-param name="to" select="$to"/>
+        </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:variable name="query" select="concat('_' , $to , ';')"/>
+
+    <xsl:choose>
+        <xsl:when test="$line != 'UNDEF'"> <!-- found -->
+            <!-- list => _to;cost;ratio;start;prev_ => ratio -->
+            <xsl:value-of select="substring-before( substring-after( substring-after( substring-after($line, $query), ';' ), ';' ), ';' )"/>
         </xsl:when>
         <!-- path undefined => infinte cost -->
         <xsl:otherwise>UNDEF</xsl:otherwise>
@@ -306,7 +333,6 @@
         <xsl:with-param name="to" select="1"/>
     </xsl:call-template>
     <xsl:text>&#xa;</xsl:text>
-
     <xsl:call-template name="get_existing_cost">
         <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
         <xsl:with-param name="to" select="2"/>
@@ -318,7 +344,6 @@
         <xsl:with-param name="to" select="1"/>
     </xsl:call-template>
     <xsl:text>&#xa;</xsl:text>
-    
     <xsl:call-template name="get_existing_line">
         <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
         <xsl:with-param name="to" select="2"/>
@@ -330,7 +355,6 @@
         <xsl:with-param name="to" select="1"/>
     </xsl:call-template>
     <xsl:text>&#xa;</xsl:text>
-
     <xsl:call-template name="get_previous">
         <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
         <xsl:with-param name="to" select="2"/>
@@ -342,11 +366,23 @@
         <xsl:with-param name="to" select="1"/>
     </xsl:call-template>
     <xsl:text>&#xa;</xsl:text>
-
     <xsl:call-template name="get_ratio">
         <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
         <xsl:with-param name="to" select="2"/>
     </xsl:call-template>
     <xsl:text>&#xa;</xsl:text>
+
+    <xsl:call-template name="get_start">
+        <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
+        <xsl:with-param name="to" select="1"/>
+    </xsl:call-template>
+    <xsl:text>&#xa;</xsl:text>
+    <xsl:call-template name="get_start">
+        <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
+        <xsl:with-param name="to" select="2"/>
+    </xsl:call-template>
+    <xsl:text>&#xa;</xsl:text>
+
+
 </xsl:template>
 </xsl:stylesheet>
