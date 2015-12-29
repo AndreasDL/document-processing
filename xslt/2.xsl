@@ -32,20 +32,22 @@
 
 </xsl:template>
 
+<!-- find all branches, given a start and previous index -->
 <xsl:template name="find_end">
     <!-- readonly -->
     <xsl:param name="curr_para"/>
-    <xsl:param name="previous"/>
-    <xsl:param name="start"/>
+    <xsl:param name="prev_index"/>
+    <xsl:param name="start_index"/>
     <xsl:param name="l_max"/>
     <!-- will change during recursion -->
-    <xsl:param name="stop"/> <!--init at start -->
+    <xsl:param name="stop_index"/> <!--init at start -->
     <xsl:param name="l_prev"/> <!-- init at 0 -->
     <xsl:param name="y_prev"/> <!-- init at 0 -->
     <xsl:param name="z_prev"/> <!-- init at 0 -->
 
     <!-- readability++ -->
-    <xsl:variable name="curr_element"  select="./*[position() = $stop]"/>
+    <xsl:variable name="curr_element" select="$curr_para[position() = $stop_index]"/>
+    <xsl:variable name="next_element" select="$curr_para[position() = $stop_index+1]"/>
 
     <!-- update l , y, z values -->
     <xsl:variable name="l_curr">
@@ -89,12 +91,12 @@
             </xsl:when>
             
             <!-- no stretchability for the element => nothing changes -->
-            <xsl:when test="$curr_element/@stretchability = ''">
+            <xsl:when test="$curr_element/@shrinkability = ''">
                 <xsl:value-of select="$y_prev"/>
             </xsl:when>
 
             <xsl:otherwise>
-                <xsl:value-of select="$y_prev + $curr_element/@stretchability"/>
+                <xsl:value-of select="$y_prev + $curr_element/@shrinkability"/>
             </xsl:otherwise>
         </xsl:choose> 
     </xsl:variable>
@@ -110,9 +112,29 @@
     </xsl:variable>
 
     <!-- can we split ? -->
-    <xsl:if test="$ratio = 'NaN' and $ratio > -1 and name($curr_element) = 'box' and "/>
-
-
+    <!-- we can only split on a penalty if its penalty is < INF and the break is required or optional. -->
+    <!-- we can only split on a box if the next element is not a penalty -->
+    <!-- we can only split if the ratio is > -1 and ratio != NaN-->
+    <xsl:if test="
+    (
+        (
+                name($curr_element) = 'penalty' 
+            and 
+                not( 
+                        $curr_element/@penalty = 'INF' 
+                    or
+                        $curr_element/@break='prohibited'
+                )
+        ) or (
+                name($curr_element) = 'box'
+            and
+                name($next_element) != 'penalty'
+        )
+    ) and (
+            $ratio > -1 
+        and 
+            number($ratio) = number($ratio)
+    )">
 
         <!-- get cost -->
         <xsl:variable name="cost">
@@ -122,7 +144,36 @@
             </xsl:call-template>
         </xsl:variable>
 
+        <!-- write branch -->
+        <xsl:call-template name="writeBranch">
+            <xsl:with-param name="ratio" select="$ratio"/>
+            <xsl:with-param name="cost" select="$cost"/>
+            <xsl:with-param name="prev_index" select="$prev_index"/>
+            <xsl:with-param name="start_index" select="$start_index"/>
+            <xsl:with-param name="stop_index" select="$stop_index"/>
+        </xsl:call-template>
 
+        <!-- recursion -->
+        <!-- continue recursion if we are not at end of paragraph -->
+        <!-- and if current width - current shrink < line width -->
+        <xsl:if test="
+            count($curr_para/*) > $stop_index 
+        and
+            $l_max > ($l_curr - $z_curr)
+        ">
+            <xsl:call-template name="find_end">
+                <!-- readonly -->
+                <xsl:with-param name="curr_para" select="$curr_para"/>
+                <xsl:with-param name="prev_index" select="$prev_index"/>
+                <xsl:with-param name="start_index" select="$start_index"/>
+                <xsl:with-param name="l_max" select="$l_max"/>
+                <!-- update these -->
+                <xsl:with-param name="stop_index" select="$stop_index + 1"/> 
+                <xsl:with-param name="l_prev" select="$l_curr"/>
+                <xsl:with-param name="y_prev" select="$y_curr"/>
+                <xsl:with-param name="z_prev" select="$z_curr"/>
+            </xsl:call-template>
+        </xsl:if>
 </xsl:template>
 
 <!-- calculate the ratio -->
@@ -214,7 +265,7 @@
 <xsl:template name="writeBranch">
     <xsl:param name="ratio"/>
     <xsl:param name="cost"/>
-    <xsl:param name="prev_break"/>
+    <xsl:param name="prev_index"/>
     <xsl:param name="start_index"/>
     <xsl:param name="stop_index"/>
 
@@ -236,7 +287,7 @@
         </xsl:attribute>
 
         <xsl:attribute name="previous">
-            <xsl:value-of select="$prev_break"/>
+            <xsl:value-of select="$prev_index"/>
         </xsl:attribute>
     </branch>
 </xsl:template>
