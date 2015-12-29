@@ -33,23 +33,23 @@
     <xsl:value-of select="$shortest_paths"/>
     <xsl:text>&#xa;</xsl:text-->
 
-    <!--xsl:variable name="path">
+    <xsl:variable name="path">
         <xsl:call-template name="extract_path">
             <xsl:with-param name="shortest_paths" select="$shortest_paths"/>
             <xsl:with-param name="curr_index" select="$target_node"/>
             <xsl:with-param name="path"><xsl:value-of select="$target_node"/></xsl:with-param>
         </xsl:call-template>
-    </xsl:variable-->
+    </xsl:variable>
 
     <!--xsl:text>&#xa;</xsl:text>
     <xsl:value-of select="$path"/>
     <xsl:text>&#xa;</xsl:text-->
 
-    <!--xsl:call-template name="format_output">
+    <xsl:call-template name="format_output">
         <xsl:with-param name="path" select="substring-after($path, ';')"/>
         <xsl:with-param name="start_index" select="substring-before($path, ';')"/>
         <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
-    </xsl:call-template-->
+    </xsl:call-template>
 
     </paragraph>
 </xsl:template>
