@@ -36,7 +36,7 @@
             <!-- we start by determining the branches at the start position, we handle this seperatly since the value for previous is not defined (and set to zero) -->
             <xsl:call-template name="find_end">
                 <!-- readonly -->
-                <xsl:with-param name="curr_para" select="$curr_para"/>
+                <xsl:with-param name="curr_para" select="."/>
                 <xsl:with-param name="prev_index" select="0"/>
                 <xsl:with-param name="start_index" select="1"/>
                 <xsl:with-param name="l_max" select="$l_max"/>
@@ -167,12 +167,12 @@
             </xsl:when>
             
             <xsl:when test="$curr_element/@shrinkability">
-                <xsl:value-of select="$z_prev + $curr_element/@shrinkability"/>
+                <xsl:value-of select="$y_prev + $curr_element/@shrinkability"/>
             </xsl:when>
             
             <!-- no stretchability for the element => nothing changes -->
             <xsl:otherwise>
-                <xsl:value-of select="$z_prev"/>    
+                <xsl:value-of select="$y_prev"/>    
             </xsl:otherwise>
         </xsl:choose> 
     </xsl:variable>
