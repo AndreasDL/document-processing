@@ -16,51 +16,59 @@
 
     <xsl:variable name="target_node" select= "./branches/branch[last()]/@end"/>
 
-    <xsl:call-template name="debug">
+    <!--xsl:call-template name="debug">
         <xsl:with-param name="shortest_paths">_1;2;3;4;undef_</xsl:with-param>
-    </xsl:call-template>
+    </xsl:call-template-->
 
     <!-- get list with shortest path to each node in tree -->
-    <!--xsl:variable name="shortest_paths">
+    <xsl:variable name="shortest_paths">
         <xsl:call-template name="find_shortest_paths">
             <xsl:with-param name="list_of_paths">_0;0;0;0;undef_</xsl:with-param>
             <xsl:with-param name="index_count" select="count(./branches/*)"/>
             <xsl:with-param name="index" select="1"/>
         </xsl:call-template>
-    </xsl:variable-->
+    </xsl:variable>
    
     <!--xsl:text>&#xa;</xsl:text>
     <xsl:value-of select="$shortest_paths"/>
     <xsl:text>&#xa;</xsl:text-->
 
-    <!--xsl:variable name="path">
+    <xsl:variable name="path">
         <xsl:call-template name="extract_path">
             <xsl:with-param name="shortest_paths" select="$shortest_paths"/>
             <xsl:with-param name="curr_index" select="$target_node"/>
             <xsl:with-param name="path"><xsl:value-of select="$target_node"/></xsl:with-param>
         </xsl:call-template>
-    </xsl:variable-->
+    </xsl:variable>
 
     <!--xsl:text>&#xa;</xsl:text>
     <xsl:value-of select="$path"/>
     <xsl:text>&#xa;</xsl:text-->
 
     <!-- add ; to end of path for easy string splitting -->
-    <!--xsl:call-template name="format_output">
+    <xsl:call-template name="format_output">
         <xsl:with-param name="path" select="concat(substring-after($path, ';'), ';')"/> 
-        <xsl:with-param name="start_index" select="substring-before($path, ';')"/>
+        <xsl:with-param name="path_index" select="substring-before($path, ';')"/>
         <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
-    </xsl:call-template-->
+    </xsl:call-template>
 
     </paragraph>
 </xsl:template>
 
 <xsl:template name="format_output">
     <xsl:param name="path"/> <!-- list firstnode;node;node;node;targetnode; !!note ; at the end! important much--> 
-    <xsl:param name="start_index"/>
+    <xsl:param name="path_index"/>
     <xsl:param name="list_of_paths"/> <!-- list => _to;cost;ratio;start;prev_ -->
 
     <xsl:variable name="stop_index" select="substring-before($path, ';')"/>
+    
+    <xsl:variable name="start_index">
+        <xsl:call-template name="get_start">
+            <xsl:with-param name="to" select="$stop_index"/>
+            <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
+        </xsl:call-template>
+    </xsl:variable>
+
     <!--xsl:value-of select="concat('line from ', $start_index, ' to ' , $stop_index)"/-->
     <xsl:if test="string-length($stop_index) > 0">
         <line>
@@ -82,7 +90,7 @@
         <!-- recursion -->
         <xsl:call-template name="format_output">
             <xsl:with-param name="path" select="substring-after($path, ';')"/>
-            <xsl:with-param name="start_index" select="$stop_index + 1"/>
+            <xsl:with-param name="path_index" select="$stop_index + 1"/>
             <xsl:with-param name="list_of_paths" select="$list_of_paths"/>
         </xsl:call-template>
     </xsl:if>
