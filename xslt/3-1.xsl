@@ -46,7 +46,7 @@
     <xsl:text>&#xa;</xsl:text-->
 
     <xsl:call-template name="format_output">
-        <xsl:with-param name="path" select="substring-after($path, ';')"/>
+        <xsl:with-param name="path" select="concat(substring-after($path, ';'), ';')"/>
         <xsl:with-param name="start_index" select="substring-before($path, ';')"/>
         <xsl:with-param name="list_of_paths" select="$shortest_paths"/>
     </xsl:call-template>
