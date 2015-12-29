@@ -114,8 +114,8 @@
     <xsl:param name="y_prev"/> <!-- init at 0 -->
     <xsl:param name="z_prev"/> <!-- init at 0 -->
 
-    <xsl:value-of select="concat('prev ' ,  $prev_index, ' stop ', $stop_index)"/>
-    <xsl:text>&#xa;</xsl:text>
+    <!--xsl:value-of select="concat('prev ' ,  $prev_index, ' stop ', $stop_index)"/>
+    <xsl:text>&#xa;</xsl:text-->
 
     <!-- readability++ -->
     <xsl:variable name="curr_element" select="$curr_para/*[position() = $stop_index]"/>
@@ -187,8 +187,8 @@
         </xsl:call-template>
     </xsl:variable>
     
-    <xsl:value-of select="concat($l_max, '-' , $l_curr, ' - ' , $y_curr , ' - ', $z_curr , ' - ', $ratio )"/>
-    <xsl:text>&#xa;</xsl:text>
+    <!--xsl:value-of select="concat($l_max, '-' , $l_curr, ' - ' , $y_curr , ' - ', $z_curr , ' - ', $ratio )"/>
+    <xsl:text>&#xa;</xsl:text-->
 
     <!-- can we split ? -->
     <!-- we can only split on a penalty if its penalty is < INF and the break is required or optional. -->
