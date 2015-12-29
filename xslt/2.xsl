@@ -99,7 +99,7 @@
         </xsl:choose> 
     </xsl:variable>
 
-    <!-- Calculate the ratio -->
+    <!-- get ratio -->
     <xsl:variable name="ratio">
         <xsl:call-template name="get_ratio">
             <xsl:with-param name="l_max" select="$l_max"/>
@@ -110,11 +110,22 @@
     </xsl:variable>
 
     <!-- can we split ? -->
-    <xsl:if test=""/>
+    <xsl:if test="$ratio = 'NaN' and $ratio > -1 and name($curr_element) = 'box' and "/>
+
+
+
+        <!-- get cost -->
+        <xsl:variable name="cost">
+            <xsl:call-template name="get_cost">
+                <xsl:with-param name="ratio" select="$ratio"/>
+                <xsl:with-param name="curr_element" select="$curr_element"/>
+            </xsl:call-template>
+        </xsl:variable>
 
 
 </xsl:template>
 
+<!-- calculate the ratio -->
 <xsl:template name="get_ratio">
     <!--slide 23-->
     <xsl:param name="l_max"/>
@@ -139,7 +150,7 @@
                     
                     <!-- undef -->
                     <xsl:otherwise>
-                        <xsl:value-of select="0"/>
+                        <xsl:value-of select="NaN"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
@@ -154,7 +165,7 @@
                     
                     <!-- undef -->
                     <xsl:otherwise>
-                        <xsl:value-of select="0"/>
+                        <xsl:value-of select="NaN"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:otherwise>
@@ -164,6 +175,7 @@
     <xsl:value-of select="$ratio"/>
 </xsl:template>
 
+<!-- calculate the cost -->
 <xsl:template name="get_cost">
     <xsl:param name="ratio"/>
     <xsl:param name="curr_element"/>
@@ -196,6 +208,37 @@
             <xsl:value-of select="$penalty_for_spacing"/>
         </xsl:otherwise>
     </xsl:choose>
+</xsl:template>
+
+<!-- write branch to output -->
+<xsl:template name="writeBranch">
+    <xsl:param name="ratio"/>
+    <xsl:param name="cost"/>
+    <xsl:param name="prev_break"/>
+    <xsl:param name="start_index"/>
+    <xsl:param name="stop_index"/>
+
+    <branch>
+        <xsl:attribute name="cost">
+            <xsl:value-of select="$cost"/>
+        </xsl:attribute>
+
+        <xsl:attribute name="ratio">
+            <xsl:value-of select="$ratio"/>
+        </xsl:attribute>
+        
+        <xsl:attribute name="start">
+            <xsl:value-of select="$start_index"/>
+        </xsl:attribute>
+
+        <xsl:attribute name="end">
+            <xsl:value-of select="$stop_index"/>
+        </xsl:attribute>
+
+        <xsl:attribute name="previous">
+            <xsl:value-of select="$prev_break"/>
+        </xsl:attribute>
+    </branch>
 </xsl:template>
 
 </xsl:stylesheet>
