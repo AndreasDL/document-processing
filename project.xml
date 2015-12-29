@@ -5,16 +5,16 @@
     </student>
     <solution>
         <step>
-            <transformation>1-1.xsl</transformation>
+            <transformation>1.xsl</transformation>
         </step>
         <step fallback="false">
             <transformation>2.xsl</transformation>
         </step>
         <step fallback="false">
-            <transformation>3-1.xsl</transformation>
+            <transformation>3.xsl</transformation>
         </step>
         <step fallback="false">
-            <transformation>4-1.xsl</transformation>
+            <transformation>4.xsl</transformation>
         </step>
     </solution>
 </project>
