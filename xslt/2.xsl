@@ -18,19 +18,75 @@
             <xsl:copy-of select="current()/*"/>
         </content>
 
-        <branches>
+        <!-- determine l_max, might be line width of document of the width of the paragraph -->
+        <xsl:variable name="l_max">
+            <xsl:choose>
+                <xsl:when test="string-length(@line-width)">
+                    <xsl:value-of select="@line-width"/>>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="/document/@line-width"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
 
+        <xsl:variable name="curr_para" select="."/>
+        <!-- determine the branches -->
+        <branches>
+            <!-- we start by determining the branches at the start position, we handle this seperatly since the value for previous is not defined (and set to zero) -->
+            <xsl:call-template name="find_end">
+                <!-- readonly -->
+                <xsl:with-param name="curr_para" select="."/>
+                <xsl:with-param name="prev_index" select="0"/>
+                <xsl:with-param name="start_index" select="1"/>
+                <xsl:with-param name="l_max" select="$l_max"/>
+                <!-- init these -->
+                <xsl:with-param name="stop_index" select="1"/> 
+                <xsl:with-param name="l_prev" select="0"/>
+                <xsl:with-param name="y_prev" select="0"/>
+                <xsl:with-param name="z_prev" select="0"/>
+            </xsl:call-template>
             
+
+            <!-- handle other elements in the paragraph -->
+            <xsl:for-each select="$curr_para/*">
+                <xsl:variable name="curr_element" select="."/>
+                <xsl:variable name="next_element" select="following-subling::*[1]"/>
+
+                <!-- check if we are positioned at a possible breakpoint -->
+                <!-- possible break point: -->
+                <!-- 
+                    - current element is a required of prohibited penalty that is < INF 
+                    - current element is a box (we'll ignore preceeding glue elements) and if the next element is not a penalty 
+                -->
+                <xsl:if test="
+                (
+                        name($curr_element) = 'penalty' 
+                    and 
+                        $curr_element/@penalty != 'INF'
+                    and
+                        $curr_element/@break != 'prohibited'
+                ) or (
+                        name($curr_element) = 'box'
+                    and
+                        name($next_element) != 'penalty' 
+                )">
+                    <!-- previous is the end position of the previous branch -->
+                    <xsl:variable name="prev_index" select="position()"/>
+                    <!-- start_index is the index of the first possible break -->
+                    <xsl:variable name="start_index" select="count(following-sibling::*[name() = 'box'][1]/preceding-sibling::*)+1" /> />
+
+
+
+                </xsl:if>
+
+            </xsl:for-each>
         </branches>
 
 
     </xsl:copy>
 </xsl:template>
 
-<xsl:template name="find_start">
-    <xsl:param name="curr_para"/>
-
-</xsl:template>
 
 <!-- find all branches, given a start and previous index -->
 <xsl:template name="find_end">
