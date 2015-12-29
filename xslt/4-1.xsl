@@ -171,7 +171,7 @@
     <xsl:variable name="curr_element_width" select="$curr_element/@width"/>
 
     <!-- only write output when the element is text-->
-    <xsl:if test="$curr_element_type = 'box' and $curr_element_width != 0">
+    <xsl:if test="$curr_element_type = 'box' and $curr_element_width > 0">
         <tspan>
             <xsl:attribute name="textLength">
                 <xsl:value-of select="$curr_element_width"/>
@@ -192,22 +192,30 @@
     </xsl:if>
 
     <!-- recursion -->
+    <xsl:variable name="x_new">
+        <xsl:choose>
+            <xsl:when test="$curr_element_type = 'glue'">
+                <xsl:value-of select="$x_curr + $curr_element_width + $curr_element/@stretchability * $ratio"/>
+            </xsl:when>
+            <xsl:when test="$curr_element_type = 'box'">
+                <xsl:value-of select="$x_curr + $curr_element_width"/>
+            </xsl:when>
+            <!-- ignore penalty elements -->
+            <xsl:otherwise>
+                <xsl:value-of select="$x_curr"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+
+    <xsl:value-of select="$x_new"/>
+    <xsl:text>&#xa;</xsl:text>
+
     <xsl:if test="$line_count > $index">
         <xsl:call-template name="convertLine">
             <xsl:with-param name="y" select="$y"/>
             <xsl:with-param name="line_count" select="$line_count"/>
             <xsl:with-param name="index" select="$index + 1"/>
-
-            <xsl:with-param name="x_curr">
-                <xsl:choose>
-                    <xsl:when test="$curr_element_type = 'glue'">
-                        <xsl:value-of select="$x_curr + $curr_element_width + $curr_element/@stretchability * $ratio"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="$x_curr + $curr_element_width"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:with-param>
+            <xsl:with-param name="x_curr" select="$x_new"/>
         </xsl:call-template>
     </xsl:if>
 </xsl:template>
